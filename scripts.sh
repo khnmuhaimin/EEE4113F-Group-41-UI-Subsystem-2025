@@ -1,5 +1,21 @@
 #!/usr/bin/env bash
 
+
+help_message="This .sh file contains some helpful scripts.
+Run ./scripts {option}
+Available options are: start-server, stop-server, start-tunnel, stop-tunnel, tunnel_password."
+
+if [[ $# -eq 0 ]]; then
+    echo "$help_message"
+fi
+
+if [[ ! -f .env ]]; then
+    cp env-template .env
+    echo 'No .env file found. A .env template is being generated.'
+    echo 'Complete it and try again.'
+    exit 0
+fi
+
 source .env
 
 case $1 in
@@ -57,8 +73,6 @@ case $1 in
         echo "The tunnel password is $tunnel_password."
         ;;
     *)
-        echo 'This .sh file contains some helpful scripts.'
-        echo 'Run ./scripts {option}'
-        echo 'Available options are: start-server, stop-server, start-tunnel, stop-tunnel, tunnel_password.'
+        echo "$help_message"
         ;;
 esac
