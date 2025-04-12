@@ -8,7 +8,7 @@ case $1 in
             python3 -m venv .venv
         fi
         source .venv/bin/activate
-        pip install -r requirements.txt
+        pip install -r requirements.txt -qq
         gunicorn_count=$(ps aux | grep 'gunicorn server:server' | grep -v grep | wc -l)
         if [[ $gunicorn_count -ne 0 ]]; then
             echo 'The server is already running.'
