@@ -31,16 +31,17 @@ case $1 in
         if [[ $lt_counts -ne 0 ]]; then
             echo 'LocalTunnel is already running.'
             echo 'See localtunnel-logs.txt for logs.'
-        elif [[ $SERVER_MODE == 'TEST' ]]; then
-            npm install
-            npx lt --port $PORT --subdomain $DOMAIN > localtunnel-logs.txt 2>&1 &
-            echo "Requests to $DOMAIN are being redirected to the port $PORT."
-            echo 'See localtunnel-logs.txt for logs.'
         else
-            npm install
-            npx lt --port $PORT > localtunnel-logs.txt 2>&1 &
-            echo "Requests to a random domain are being redirected to the port $PORT."
-            echo 'See localtunnel-logs.txt for logs.'
+            npm install --silent
+            if [[ $SERVER_MODE == 'TEST' ]]; then
+                npx lt --port $PORT --subdomain $DOMAIN --https > localtunnel-logs.txt 2>&1 &
+                echo "Requests to $DOMAIN are being redirected to the port $PORT."
+                echo 'See localtunnel-logs.txt for logs.'
+            else
+                npx lt --port $PORT --https > localtunnel-logs.txt 2>&1 &
+                echo "Requests to a random domain are being redirected to the port $PORT."
+                echo 'See localtunnel-logs.txt for logs.'
+            fi
         fi
         ;;
     stop-tunnel)
@@ -51,9 +52,13 @@ case $1 in
             echo 'LocalTunnel was not running to begin with.'
         fi
         ;;
+    tunnel-password)
+        tunnel_password=$(curl -s https://loca.lt/mytunnelpassword)
+        echo "The tunnel password is $tunnel_password."
+        ;;
     *)
         echo 'This .sh file contains some helpful scripts.'
         echo 'Run ./scripts {option}'
-        echo 'Available options are: start-server, stop-server, start-tunnel, stop-tunnel.'
+        echo 'Available options are: start-server, stop-server, start-tunnel, stop-tunnel, tunnel_password.'
         ;;
 esac

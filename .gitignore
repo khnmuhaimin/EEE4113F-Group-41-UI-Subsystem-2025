@@ -2,3 +2,5 @@
 node_modules/
 .env
 /**/__pycache__/
+localtunnel-logs.txt
+server-logs.txt
