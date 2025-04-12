@@ -35,7 +35,7 @@ case $1 in
             npm install --silent
             if [[ $SERVER_MODE == 'TEST' ]]; then
                 npx lt --port $PORT --subdomain $DOMAIN --https > localtunnel-logs.txt 2>&1 &
-                echo "Requests to $DOMAIN are being redirected to the port $PORT."
+                echo "Requests to $DOMAIN.loca.lt are being redirected to the port $PORT."
                 echo 'See localtunnel-logs.txt for logs.'
             else
                 npx lt --port $PORT --https > localtunnel-logs.txt 2>&1 &

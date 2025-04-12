@@ -3,10 +3,9 @@
 ## Overview
 I'll put the code and stuff for the UI subsystem here.
 
-## How to use the repo
+## Getting Started
 
-### Environment Variables
-The .env file contains some configuration options.
+To start the server, run ```./scripts.sh start-server```.
+To expose the server to the internet, run ```./scripts.sh start-tunnel```.
 
-### Scripts
-The scripts.sh file contains some helpful scripts to get things working. Run it to see usage help.
+The shell file ```scripts.sh``` contains some other functions too. To view them, run ```./scripts.sh```.
