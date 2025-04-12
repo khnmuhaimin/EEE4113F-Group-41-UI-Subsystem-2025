@@ -1,0 +1,8 @@
+[2025-04-12 20:42:27 +0200] [79109] [INFO] Starting gunicorn 23.0.0
+[2025-04-12 20:42:27 +0200] [79109] [INFO] Listening at: http://0.0.0.0:8000 (79109)
+[2025-04-12 20:42:27 +0200] [79109] [INFO] Using worker: sync
+[2025-04-12 20:42:27 +0200] [79141] [INFO] Booting worker with pid: 79141
+[2025-04-12 20:42:46 +0200] [79141] [INFO] Worker exiting (pid: 79141)
+[2025-04-12 20:42:46 +0200] [79109] [INFO] Handling signal: term
+[2025-04-12 20:42:46 +0200] [79109] [ERROR] Worker (pid:79141) was sent SIGTERM!
+[2025-04-12 20:42:46 +0200] [79109] [INFO] Shutting down: Master
