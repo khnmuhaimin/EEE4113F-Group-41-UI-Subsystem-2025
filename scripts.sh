@@ -3,7 +3,7 @@
 
 help_message="This .sh file contains some helpful scripts.
 Run ./scripts {option}
-Available options are: start-server, stop-server, start-tunnel, stop-tunnel, tunnel_password."
+Available options are: start-server, stop-server, restart-server, start-tunnel, stop-tunnel, tunnel_password."
 
 if [[ $# -eq 0 ]]; then
     echo "$help_message"
@@ -25,22 +25,26 @@ case $1 in
         fi
         source .venv/bin/activate
         pip install -r requirements.txt -qq
-        gunicorn_count=$(ps aux | grep 'gunicorn server:server' | grep -v grep | wc -l)
+        gunicorn_count=$(ps aux | grep 'gunicorn server.server:server' | grep -v grep | wc -l)
         if [[ $gunicorn_count -ne 0 ]]; then
             echo 'The server is already running.'
         else
-            gunicorn server:server --bind 0.0.0.0:$PORT > server-logs.txt 2>&1 &
+            gunicorn server.server:server --bind 0.0.0.0:$PORT > server-logs.txt 2>&1 &
             echo 'The server is running in the background.'
             echo 'See server logs at server-logs.txt.'
         fi
         ;;
     stop-server)
-        pkill -15 -f 'gunicorn server:server'
+        pkill -15 -f 'gunicorn server.server:server'
         if [[ $? == 0 ]]; then
             echo 'The server was shut down.'
         else
             echo 'The server was not running to begin with.'
         fi
+        ;;
+    restart-server)
+        ./scripts.sh stop-server
+        ./scripts.sh start-server
         ;;
     start-tunnel)
         lt_counts=$(ps aux | grep 'npm exec lt' | grep -v grep | wc -l)
