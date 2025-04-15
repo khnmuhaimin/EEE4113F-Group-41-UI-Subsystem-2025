@@ -9,12 +9,12 @@ from database.utils.utils import utc_timestamp
 
 
 class RegistrationTask(Base):
-    __tablename__ = "registration_task"
+    __tablename__ = "registration_tasks"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     task_id: Mapped[UUID] = mapped_column(default=uuid4, unique=True)  # used externally
     ip_address: Mapped[str] = mapped_column(String(39))  # to enable two-way communication
-    api_key: str = None
+    api_key: str = None  # temporary key to authenticate node during registration
     hashed_api_key: Mapped[Optional[str]] = mapped_column(String(64))
     leds_flashing: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[int] = mapped_column(default=utc_timestamp)
