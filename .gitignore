@@ -1,6 +1,6 @@
-.venv/
-node_modules/
-.env
+/**/.venv/
+/**/node_modules/
+/**/.env
 /**/__pycache__/
-localtunnel-logs.txt
-server-logs.txt
+backend/localtunnel-logs.txt
+backend/server-logs.txt

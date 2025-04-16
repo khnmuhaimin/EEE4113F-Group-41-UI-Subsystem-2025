@@ -12,10 +12,12 @@ weighing_node_blueprint = Blueprint("weighing_node", __name__, url_prefix='/weig
 
 @weighing_node_blueprint.route("/registration/start", methods=["POST"])
 def start_registration():
-    # auth_header = request.headers.get("Authorization")
-    # correct_key = verify_preshared_key(auth_header)
-    # if not correct_key:
-    #     return ("Invalid key.", 401)
+    # authenticate node
+    auth_header = request.headers.get("Authorization")
+    correct_key = verify_preshared_key(auth_header)
+    if not correct_key:
+        return ("Invalid key.", 401)
+    # add new registration task to database
     with Session(database_engine) as session:
         client_ip_address = request.remote_addr
         task = RegistrationTask(ip_address=client_ip_address)
@@ -24,14 +26,14 @@ def start_registration():
         session.add(task)
         session.commit()
         uuid = task.task_id
-        hashed_api_key = task.hashed_api_key
+        api_key = task.api_key
     # TODO: alert admin
-    return (f"{uuid}\n{hashed_api_key}\n", 200)
+    return (f"{uuid}\n{api_key}\n", 200)
 
 
 @weighing_node_blueprint.route("/registration/tasks")
 def get_registration_tasks():
-    # TODO: do admin auth
+    
     with Session(database_engine) as session:
         tasks = session.scalars(select(RegistrationTask)).all()
     tasks = list(map(lambda t: t.admin_view(), tasks))

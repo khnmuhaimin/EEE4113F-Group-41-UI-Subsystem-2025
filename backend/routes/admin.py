@@ -57,5 +57,3 @@ def login():
         response = make_response("", 204)
         response.set_cookie("session_id", str(admin_session.session_id), httponly=True, secure=True)
         return response
-
-        

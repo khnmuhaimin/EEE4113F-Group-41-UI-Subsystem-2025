@@ -88,7 +88,7 @@ def hash_password(password: str) -> str:
     return hash
 
 
-def verify_password(password: str, hash: str) -> bool:
+def is_password_correct(password: str, hash: str) -> bool:
     """
     Verifies if the provided password matches the stored hash.
     
@@ -107,4 +107,7 @@ def verify_password(password: str, hash: str) -> bool:
         is_valid = verify_password("my_secure_password", stored_hash)
     """
     ph = argon2.PasswordHasher()
-    return ph.verify(hash, password)
+    try:
+        return ph.verify(hash, password)
+    except:
+        return False

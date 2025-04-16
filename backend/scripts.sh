@@ -10,7 +10,6 @@ if [[ $# -eq 0 ]]; then
 fi
 
 if [[ ! -f .env ]]; then
-    cp env-template .env
     echo 'No .env file found. A .env template is being generated.'
     echo 'Complete it and try again.'
     exit 0
@@ -29,7 +28,12 @@ case $1 in
         if [[ $gunicorn_count -ne 0 ]]; then
             echo 'The server is already running.'
         else
-            gunicorn server.server:server --bind 0.0.0.0:$PORT > server-logs.txt 2>&1 &
+            if [[ $SERVER_MODE == 'DEBUG' ]]; then
+                log_level="DEBUG"
+            else
+                log_level="INFO"
+            fi
+            gunicorn server.server:server --bind 0.0.0.0:$PORT --access-logfile - --log-level $log_level > server-logs.txt 2>&1 &
             echo 'The server is running in the background.'
             echo 'See server logs at server-logs.txt.'
         fi
@@ -53,7 +57,7 @@ case $1 in
             echo 'See localtunnel-logs.txt for logs.'
         else
             npm install --silent
-            if [[ $SERVER_MODE == 'TEST' ]]; then
+            if [[ $SERVER_MODE == 'DEMO' ]]; then
                 npx lt --port $PORT --subdomain $DOMAIN --https > localtunnel-logs.txt 2>&1 &
                 echo "Requests to $DOMAIN.loca.lt are being redirected to the port $PORT."
                 echo 'See localtunnel-logs.txt for logs.'
