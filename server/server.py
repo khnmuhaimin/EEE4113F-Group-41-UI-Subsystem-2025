@@ -1,17 +1,19 @@
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv()  # load env vars before running the app
 import os
 import sys
 
 from flask import Flask
 
-# import database to create the tables
-from database import database
+from log.log import logger
+from database import database  # import database to create the tables
 from routes.weighing_nodes import weighing_node_blueprint
+from routes.admin import admin_blueprint
 
 
 server = Flask(__name__)
 server.register_blueprint(weighing_node_blueprint)
+server.register_blueprint(admin_blueprint)
 
     
 @server.route("/")
