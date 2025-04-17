@@ -1,0 +1,6 @@
+/**/__pycache__/
+.pytest_cache/
+.venv/
+node_modules/
+localtunnel-logs.txt
+server-logs.txt
