@@ -1,14 +1,23 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { loginAsAdmin } from './../utils/api/loginApi'
+import { ref } from "vue"
+import { useLoginStore } from "@/stores/LoginStore"
+import { LoginStatus } from "@/enums/LoginStatus"
+import router from "@/router"
 
 const email = ref("")
 const password = ref("")
-const loginMessage = ref("");
-const attemptedLogin = false;
+const loginStore = useLoginStore()
 
-const handleLogin = async () => {
-  // const response = await loginAsAdmin(email.value, password.value);
+const handleAdminLogin = async () => {
+  await loginStore.login(email.value, password.value)
+  if (loginStore.status === LoginStatus.LOGGED_IN) {
+    router.push("/dashboard")
+  }
+}
+
+const handleGuestLogin = async() => {
+  await loginStore.logout()
+  router.push("/dashboard")
 }
 </script>
 
@@ -22,9 +31,9 @@ const handleLogin = async () => {
     <input id="password" v-model="password" type="password"/>
   </div>
   <div>
-    <button @click="handleLogin">Login as Admin</button>
-    <button @click="handleLogin">Login as Guest</button>
+    <button @click="handleAdminLogin" :disabled="loginStore.inProgress()">Login as Admin</button>
+    <button @click="handleGuestLogin" :disabled="loginStore.inProgress()">Continue As Guest</button>
   </div>
-  <div>{{ `Email: ${email} Password: ${password}` }}</div>
-  <div v-if="attemptedLogin">{{ loginMessage }}</div>
+  <div v-if="loginStore.inProgress()">Loading</div>
+  <div v-if="loginStore.errorOccured()">{{ loginStore.errorMessage }}</div>
 </template>

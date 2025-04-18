@@ -48,6 +48,7 @@ case $1 in
         ;;
     restart-server)
         ./scripts.sh stop-server
+        sleep 1
         ./scripts.sh start-server
         ;;
     start-tunnel)

@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Blueprint, jsonify, make_response, request
 from sqlalchemy import select
 from sqlalchemy.orm import Session as DatabaseSession
@@ -54,6 +55,34 @@ def login():
             database_session.add(admin_session)
             database_session.commit()
 
-        response = make_response("", 204)
+        response_body = {
+            "name": admin.name,
+            "email": admin.email,
+        }
+        response = make_response(jsonify(response_body), 200)
         response.set_cookie("session_id", str(admin_session.session_id), httponly=True, secure=True)
         return response
+
+
+@admin_blueprint.route("/logout", methods=["POST"])
+def logout():
+    # if session id is not provided, return "Unauthorized" response
+    session_id = request.cookies.get("session_id")
+    if session_id is None:
+        response_body = {
+                "message": "Unauthorized."
+            }
+        return make_response(jsonify(response_body), 401)
+    
+    with DatabaseSession(database_engine) as database_session:
+        # if session id does not exist in the database, return "Unauthorized" response
+        admin_session = database_session.scalars(AdminSession.session_id == session_id).one_or_none()
+        if admin_session is None:
+            response_body = {
+                "message": "Unauthorized."
+            }
+            return make_response(jsonify(response_body), 401)
+        
+        # otherwise, delete the session and return "Success" response
+        database_session.delete(admin_session)
+        return ("", 204)

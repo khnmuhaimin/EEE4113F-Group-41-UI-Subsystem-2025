@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+from flask_cors import CORS
 load_dotenv()  # load env vars before running the app
 import os
 import sys
@@ -12,19 +13,16 @@ from routes.admin import admin_blueprint
 
 
 server = Flask(__name__, static_folder="path_to_vue_build/dist")
+CORS(server, origins="http://localhost:5173")
+
+# register blueprints here
 server.register_blueprint(weighing_node_blueprint)
 server.register_blueprint(admin_blueprint)
 
     
 @server.route('/')
 def index():
-    # Data you want to inject into the Vue app
-    dynamic_data = {
-        "key1": "item1",
-        "key2": "item2",
-        "key3": "item3"
-    }
-    return render_template('index.html', dynamic_data=dynamic_data)
+    return "Hello, World!"
 
 
 
