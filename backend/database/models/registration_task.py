@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from uuid import UUID, uuid4
-from sqlalchemy import String
+from sqlalchemy import BigInteger, String
 from sqlalchemy.orm import Mapped, mapped_column
 from database.models.base import Base
 from database.utils.utils import utc_timestamp
@@ -16,7 +16,7 @@ class RegistrationTask(Base):
     api_key: str = None  # temporary key to authenticate node during registration
     hashed_api_key: Mapped[str | None] = mapped_column(String(64))
     leds_flashing: Mapped[bool] = mapped_column(default=False)
-    created_at: Mapped[int] = mapped_column(default=utc_timestamp)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=utc_timestamp)
 
 
     def admin_view(self) -> dict:

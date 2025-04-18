@@ -1,4 +1,4 @@
-from sqlalchemy import String
+from sqlalchemy import BigInteger, String
 from sqlalchemy.orm import Mapped, mapped_column
 from database.models.base import Base
 from database.utils.utils import utc_timestamp
@@ -13,7 +13,7 @@ class Admin(Base):
     email: Mapped[str] = mapped_column(String(254), unique=True)
     password: str = None
     hashed_password: Mapped[str | None] = mapped_column(String(128))
-    created_at: Mapped[int] = mapped_column(default=utc_timestamp)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=utc_timestamp)
 
 
     def __repr__(self) -> str:
