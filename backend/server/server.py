@@ -6,10 +6,11 @@ import sys
 
 from flask import Flask
 
-from database import database  # import database to create the tables
+from database.database import DatabaseEngineProvider
 from routes.weighing_nodes import weighing_node_blueprint
 from routes.admin import admin_blueprint
 
+DatabaseEngineProvider.load_default_database()
 
 server = Flask(__name__)
 CORS(server, origins="http://localhost:5173")

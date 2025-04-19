@@ -4,9 +4,8 @@ from flask import Blueprint, jsonify, make_response, request
 from sqlalchemy import select
 from sqlalchemy.orm import Session as DatabaseSession
 
-from auth.auth import is_password_correct
 from routes.auth import authenticate_with_password, authenticate_with_session_id
-from database.database import database_engine
+from database.database import DatabaseEngineProvider
 from database.models.admin import Admin
 from database.models.session import DEFAULT_SESSION_DURATION, Session as AdminSession
 from database.utils.utils import utc_timestamp
@@ -28,7 +27,7 @@ def login():
     """
     email = request.json["email"]
 
-    with DatabaseSession(database_engine) as database_session:
+    with DatabaseSession(DatabaseEngineProvider.get_database_engine()) as database_session:
         admin = database_session.scalar(select(Admin).where(Admin.email == email))
 
         # Check if session already exists
@@ -77,7 +76,7 @@ def logout():
     """
     session_id = request.cookies.get("session_id")
     session_id = UUID(session_id)
-    with DatabaseSession(database_engine) as database_session:
+    with DatabaseSession(DatabaseEngineProvider.get_database_engine()) as database_session:
         admin_session = database_session.scalar(select(AdminSession).where(AdminSession.session_id == session_id))
         database_session.delete(admin_session)
         response = make_response("", HTTPStatus.NO_CONTENT)

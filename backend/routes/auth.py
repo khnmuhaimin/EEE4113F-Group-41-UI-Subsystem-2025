@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from auth.auth import verify_secret, is_password_correct
 from database.models.admin import Admin
 from database.models.weighing_node import WeighingNode
-from database.database import database_engine
+from database.database import DatabaseEngineProvider
 from database.models.session import DEFAULT_SESSION_DURATION, Session as AdminSession
 from database.utils.utils import utc_timestamp
 
@@ -33,7 +33,7 @@ def authenticate_weighing_node(func):
         node_id = request.headers.get("Node-ID")
         if node_id is None:
             return ("Node ID header is missing.", HTTPStatus.UNAUTHORIZED)
-        with Session(database_engine) as session:
+        with Session(DatabaseEngineProvider.get_database_engine()) as session:
             node = session.scalar(select(WeighingNode.uuid == node_id))
             if node is None:
                 return ("Unauthorized.", HTTPStatus.UNAUTHORIZED)
@@ -73,7 +73,7 @@ def authenticate_with_session_id(func):
                 }
             response = make_response(jsonify(response_body), HTTPStatus.UNPROCESSABLE_ENTITY)
             return response
-        with Session(database_engine) as session:
+        with Session(DatabaseEngineProvider.get_database_engine()) as session:
             # make sure the session ID exists in the database
             admin_session = session.scalar(select(AdminSession).where(AdminSession.session_id == session_id))
             if admin_session is None:
@@ -120,7 +120,7 @@ def authenticate_with_password(func):
             return make_response(jsonify(response_body), HTTPStatus.BAD_REQUEST)
         
         # make sure login details are correct
-        with Session(database_engine) as session:
+        with Session(DatabaseEngineProvider.get_database_engine()) as session:
             admin = session.scalar(select(Admin).where(Admin.email == email))
             if (admin is None
                 or not is_password_correct(password, admin.hashed_password)):

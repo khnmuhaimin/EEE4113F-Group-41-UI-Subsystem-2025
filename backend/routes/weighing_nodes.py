@@ -7,7 +7,7 @@ from auth.auth import generate_secret, hash_secret, verify_preshared_key
 from database.models.weighing_node import WeighingNode
 
 from routes.auth import authenticate_with_session_id, authenticate_weighing_node
-from database.database import database_engine
+from database.database import DatabaseEngineProvider
 
 
 weighing_node_blueprint = Blueprint("weighing_node", __name__)
@@ -34,7 +34,7 @@ def enforce_registration_in_progress_value(in_progress: bool):
             node_id = request.headers.get("Node-ID")
             if node_id is None:
                 return ("Node ID header is missing.", HTTPStatus.UNAUTHORIZED)
-            with Session(database_engine) as session:
+            with Session(DatabaseEngineProvider.get_database_engine()) as session:
                 node = session.scalars(select(WeighingNode.uuid == node_id)).first()
                 if node is None:
                     return ("Weighing node not found.", HTTPStatus.NOT_FOUND)
@@ -69,7 +69,7 @@ def update_ip_address():
     ip_address = request.remote_addr
     if ip_address is None:
         return ("IP Address not found", HTTPStatus.BAD_REQUEST)
-    with Session(database_engine) as session:
+    with Session(DatabaseEngineProvider.get_database_engine()) as session:
         node_id = request.headers.get("Node-ID")
         node = session.scalar(select(WeighingNode.uuid == node_id))
         node.ip_address = ip_address
@@ -106,7 +106,7 @@ def start_registration():
         return ("IP Address not found", HTTPStatus.BAD_REQUEST)
     
     # create the new node
-    with Session(database_engine) as session:
+    with Session(DatabaseEngineProvider.get_database_engine()) as session:
         node = WeighingNode(
             ip_address=ip_address,
         )
@@ -131,7 +131,7 @@ def get_registration_tasks():
     - 400 if session cookie is missing.
     - 401 if session is invalid or expired.
     """
-    with Session(database_engine) as session:
+    with Session(DatabaseEngineProvider.get_database_engine()) as session:
         nodes_in_registration = session.scalars(select(WeighingNode.registration_in_progress == True)).all()
         nodes_in_registration = list(map(lambda t: t.registration_in_progress_view(), nodes_in_registration))
         nodes_in_registration.sort(key=lambda t: t["created_at"])
