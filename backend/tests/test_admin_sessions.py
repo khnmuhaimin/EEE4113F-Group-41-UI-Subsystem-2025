@@ -33,7 +33,7 @@ def test_successful_admin_login(client: FlaskClient):
     """
     Verifies that login with correct admin credentials returns 200 and sets the session_id cookie.
     """
-
+    admin_name = os.environ["ADMIN_NAME"]
     admin_email = os.environ["ADMIN_EMAIL"]
     admin_password = os.environ["ADMIN_PASSWORD"]
 
@@ -44,6 +44,7 @@ def test_successful_admin_login(client: FlaskClient):
 
     assert response.status_code == 200
     assert client.get_cookie('session_id') is not None
+    assert response.json["name"] == admin_name
 
 
 def test_admin_login_failed_due_to_missing_credentials(client: FlaskClient):
