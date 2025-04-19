@@ -3,6 +3,7 @@ import os
 import secrets
 from typing import Any
 import argon2
+from config.config import Config
 
 def verify_preshared_key(preshared_key: Any) -> bool:
     """
@@ -18,7 +19,7 @@ def verify_preshared_key(preshared_key: Any) -> bool:
         KeyError: If the "PRESHARED_KEY" environment variable is not set.
     """
     try:
-        return preshared_key == os.environ.get("PRESHARED_KEY")
+        return preshared_key == Config.PRESHARED_KEY
     except KeyError:
         raise KeyError("Preshared key was not found in the environment variables.")
     

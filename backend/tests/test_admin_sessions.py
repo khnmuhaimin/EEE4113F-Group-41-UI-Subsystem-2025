@@ -2,10 +2,9 @@ import os
 import pytest
 from sqlalchemy.orm import Session
 from flask.testing import FlaskClient
-from dotenv import load_dotenv
 from sqlalchemy import create_engine
-load_dotenv()
 
+from config.config import Config
 from database.database import DatabaseEngineProvider
 from auth.auth import hash_password
 from database.models.admin import Admin
@@ -15,13 +14,13 @@ from server.server import server
 @pytest.fixture
 def database_with_test_data():
 
-    engine = create_engine(f"sqlite:///:memory:")
+    engine = create_engine(f"sqlite:///{Config.DATABASE_PATH}")
     DatabaseEngineProvider.set_database_engine(engine)
 
     try:
-        name = os.environ["ADMIN_NAME"]
-        email = os.environ["ADMIN_EMAIL"]
-        password = os.environ["ADMIN_PASSWORD"]
+        name = Config.ADMIN_NAME
+        email = Config.ADMIN_EMAIL
+        password = Config.ADMIN_PASSWORD
     except KeyError:
         raise Exception("Default admin details missing from environement variables.")
 
@@ -48,8 +47,8 @@ def client(database_with_test_data):
 def logged_in_client(database_with_test_data):
     server.config["TESTING"] = True
     with server.test_client() as client:
-        admin_email = os.environ["ADMIN_EMAIL"]
-        admin_password = os.environ["ADMIN_PASSWORD"]
+        admin_email = Config.ADMIN_EMAIL
+        admin_password = Config.ADMIN_PASSWORD
 
         client.post("/admins/login", json={
             "email": admin_email,
@@ -62,10 +61,9 @@ def test_successful_admin_login(client: FlaskClient, database_with_test_data):
     """
     Verifies that login with correct admin credentials returns 200 and sets the session_id cookie.
     """
-    admin_name = os.environ["ADMIN_NAME"]
-    admin_email = os.environ["ADMIN_EMAIL"]
-    admin_password = os.environ["ADMIN_PASSWORD"]
-
+    admin_name = Config.ADMIN_NAME
+    admin_email = Config.ADMIN_EMAIL
+    admin_password = Config.ADMIN_PASSWORD
     response = client.post("/admins/login", json={
         "email": admin_email,
         "password": admin_password
@@ -81,8 +79,8 @@ def test_admin_login_failed_due_to_missing_credentials(client: FlaskClient, data
     Checks that requests missing login fields return 400 with a relevant message and no session cookie.
     """
 
-    admin_email = os.environ["ADMIN_EMAIL"]
-    admin_password = os.environ["ADMIN_PASSWORD"]
+    admin_email = Config.ADMIN_EMAIL
+    admin_password = Config.ADMIN_PASSWORD
 
     bodies = [
         {
@@ -106,8 +104,8 @@ def test_admin_login_failed_due_to_invalid_credentials(client: FlaskClient, data
     Ensures that login attempts with incorrect email/password return 401 and no session cookie.
     """
 
-    admin_email = os.environ["ADMIN_EMAIL"]
-    admin_password = os.environ["ADMIN_PASSWORD"]
+    admin_email = Config.ADMIN_EMAIL
+    admin_password = Config.ADMIN_PASSWORD
     
     bodies = [
         {

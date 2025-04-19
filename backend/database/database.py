@@ -1,5 +1,5 @@
-import os
 from sqlalchemy import create_engine
+from config.config import Config
 from database.models.base import Base
 # import all tables so they can be created
 from database.models.admin import *
@@ -20,15 +20,10 @@ class DatabaseEngineProvider:
     @classmethod
     def get_database_engine(cls):
         if cls.database_engine is None:
-            engine = create_engine(f"sqlite:///{cls.get_database_path()}")
+            engine = create_engine(f"sqlite:///{Config.DATABASE_PATH}")
             cls.set_database_engine(engine)
         return cls.database_engine
     
     @classmethod
     def load_default_database(cls):
         cls.get_database_engine()
-    
-    @classmethod
-    def get_database_path(cls) -> str:
-        server_mode = os.environ["SERVER_MODE"]
-        return os.environ[f"{server_mode}_DATABASE_PATH"]
