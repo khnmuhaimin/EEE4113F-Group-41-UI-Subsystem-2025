@@ -1,16 +1,16 @@
 from http import HTTPStatus
-from flask import Blueprint, jsonify, make_response, request
+from flask import Blueprint, jsonify, request
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from auth.auth import generate_secret, hash_secret, verify_preshared_key
-from backend.database.models.weighing_node import WeighingNode
+from database.models.weighing_node import WeighingNode
 
-from backend.routes.auth import authenticate_with_session_id, authenticate_weighing_node
+from routes.auth import authenticate_with_session_id, authenticate_weighing_node
 from database.database import database_engine
 
 
-weighing_node_blueprint = Blueprint("weighing_node", __name__, url_prefix='/weighing-nodes')
+weighing_node_blueprint = Blueprint("weighing_node", __name__)
 
 
 def enforce_registration_in_progress_value(in_progress: bool):
@@ -35,7 +35,7 @@ def enforce_registration_in_progress_value(in_progress: bool):
             if node_id is None:
                 return ("Node ID header is missing.", HTTPStatus.UNAUTHORIZED)
             with Session(database_engine) as session:
-                node = session.scalars(select(WeighingNode.uuid == node_id)).one_or_none()
+                node = session.scalars(select(WeighingNode.uuid == node_id)).first()
                 if node is None:
                     return ("Weighing node not found.", HTTPStatus.NOT_FOUND)
                 if in_progress and not node.registration_in_progress:
@@ -52,7 +52,7 @@ enforce_registration_in_progress = enforce_registration_in_progress_value(in_pro
 enforce_registration_complete = enforce_registration_in_progress_value(in_progress=False)
 
 
-@weighing_node_blueprint.route("/ip-address", methods=["PUT"])
+@weighing_node_blueprint.route("/ip-address", methods=["PUT"], endpoint="update_ip_address")
 @authenticate_weighing_node
 @enforce_registration_in_progress
 def update_ip_address():
@@ -77,7 +77,7 @@ def update_ip_address():
     return ("", HTTPStatus.NO_CONTENT)
 
 
-@weighing_node_blueprint.route("/registration/start", methods=["POST"])
+@weighing_node_blueprint.route("/registration/start", methods=["POST"], endpoint="start_registration")
 def start_registration():
     """
     @start_registration
@@ -118,7 +118,7 @@ def start_registration():
         return (f"{node.uuid}\n{node.api_key}\n", HTTPStatus.OK)
 
 
-@weighing_node_blueprint.route("/registration/in-progress", methods=["GET"])
+@weighing_node_blueprint.route("/registration/in-progress", methods=["GET"], endpoint="get_registration_tasks")
 @authenticate_with_session_id
 def get_registration_tasks():
     """

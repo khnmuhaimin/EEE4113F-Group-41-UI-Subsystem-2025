@@ -1,8 +1,8 @@
 from sqlalchemy import BigInteger, ForeignKey
-from backend.database.models.base import Base
 from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.database.utils.utils import utc_timestamp
+from database.utils.utils import utc_timestamp
+from database.models.base import Base
 
 
 

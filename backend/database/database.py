@@ -5,7 +5,6 @@ from auth.auth import hash_password
 from database.models.base import Base
 # import all tables so they can be created
 from database.models.admin import Admin
-from database.models.registration_task import RegistrationTask
 from database.models.session import Session as AdminSession
 
 def get_database_path() -> str:

@@ -1,23 +1,22 @@
 from dotenv import load_dotenv
-from flask_cors import CORS
 load_dotenv()  # load env vars before running the app
+from flask_cors import CORS
 import os
 import sys
 
-from flask import Flask, render_template
+from flask import Flask
 
-from log.log import logger
 from database import database  # import database to create the tables
 from routes.weighing_nodes import weighing_node_blueprint
 from routes.admin import admin_blueprint
 
 
-server = Flask(__name__, static_folder="path_to_vue_build/dist")
+server = Flask(__name__)
 CORS(server, origins="http://localhost:5173")
 
 # register blueprints here
-server.register_blueprint(weighing_node_blueprint)
-server.register_blueprint(admin_blueprint)
+server.register_blueprint(weighing_node_blueprint, url_prefix="/weighing-nodes")
+server.register_blueprint(admin_blueprint, url_prefix="/admins")
 
     
 @server.route('/')
