@@ -1,4 +1,5 @@
 from http import HTTPStatus
+import uuid
 from flask import Blueprint, jsonify, request
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -127,7 +128,7 @@ def start_registration():
             return ("The IP address is already in use.", HTTPStatus.CONFLICT)
 
 
-@weighing_node_blueprint.route("/registration/in-progress", methods=["GET"], endpoint="get_registration_tasks")
+@weighing_node_blueprint.route("/registration/in-progress", endpoint="get_registration_tasks")
 @authenticate_with_session_id
 def get_registration_tasks():
     """
@@ -149,4 +150,41 @@ def get_registration_tasks():
         return response
 
 
+@weighing_node_blueprint.route("/registration/approve", methods=["POST"], endpoint="approve_weighing_node_registration")
+@authenticate_with_session_id
+def approve_weighing_node_registration():
+    """
+    Approve the registration of a weighing node by updating its status.
+
+    Responses:
+        - 204 No Content: The weighing node's registration was successfully approved or already completed.
+        - 400 Bad Request: The `weighing_node_id` is missing from the request body.
+        - 422 Unprocessable Entity: The provided `weighing_node_id` is invalid (not a valid UUID).
+    """
+    try:
+        node_id = request.json["weighing_node_id"]
+        node_id = uuid(node_id)
+    except KeyError:
+        response = jsonify({
+            "message": "The weighing node's ID is missing."
+        })
+        response.status_code = HTTPStatus.BAD_REQUEST
+        return response
+    except ValueError:
+        response = jsonify({
+            "message": "The weighing node's ID is invalid."
+        })
+        response.status_code = HTTPStatus.UNPROCESSABLE_ENTITY
+        return response
+    
+    with Session(DatabaseEngineProvider.get_database_engine()) as session:
+        node = session.scalar(select(WeighingNode).where(WeighingNode.uuid == node_id))
+        if not node.registration_in_progress:
+             return ("", HTTPStatus.NO_CONTENT)
+        node.registration_in_progress = False
+        if node.leds_flashing:
+            pass  # TODO: notify node to not flash LEDs anymore
+            node.leds_flashing = False
+        session.commit()
+        return ("", HTTPStatus.NO_CONTENT)
     
