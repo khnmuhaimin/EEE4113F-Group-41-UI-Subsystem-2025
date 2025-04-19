@@ -2,8 +2,10 @@ from http import HTTPStatus
 from flask import Blueprint, jsonify, request
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from auth.auth import generate_secret, hash_secret, verify_preshared_key
+from database.utils.utils import is_ip_address
 from database.models.weighing_node import WeighingNode
 
 from routes.auth import authenticate_with_session_id, authenticate_weighing_node
@@ -103,19 +105,26 @@ def start_registration():
     # confirm presence of IP address
     ip_address = request.remote_addr
     if ip_address is None:
-        return ("IP Address not found", HTTPStatus.BAD_REQUEST)
+        return ("IP Address not found.", HTTPStatus.BAD_REQUEST)
+    if not is_ip_address(ip_address):
+        return ("IP Address is invalid.", HTTPStatus.UNPROCESSABLE_ENTITY)
     
     # create the new node
-    with Session(DatabaseEngineProvider.get_database_engine()) as session:
-        node = WeighingNode(
-            ip_address=ip_address,
-        )
-        node.api_key = generate_secret()
-        node.hashed_api_key = hash_secret(node.api_key)
-        session.add(node)
-        session.commit()
-        # TODO: alert admin
-        return (f"{node.uuid}\n{node.api_key}\n", HTTPStatus.OK)
+    try:
+        with Session(DatabaseEngineProvider.get_database_engine()) as session:
+            node = WeighingNode(
+                ip_address=ip_address,
+            )
+            node.api_key = generate_secret()
+            node.hashed_api_key = hash_secret(node.api_key)
+            session.add(node)
+            session.commit()
+            # TODO: alert admin
+            return (f"{node.uuid}\n{node.api_key}\n", HTTPStatus.OK)
+    except IntegrityError as e:
+        error_message = str(e.orig)
+        if error_message == "UNIQUE constraint failed: weighing_nodes.ip_address":
+            return ("The IP address is already in use.", HTTPStatus.CONFLICT)
 
 
 @weighing_node_blueprint.route("/registration/in-progress", methods=["GET"], endpoint="get_registration_tasks")
@@ -132,7 +141,7 @@ def get_registration_tasks():
     - 401 if session is invalid or expired.
     """
     with Session(DatabaseEngineProvider.get_database_engine()) as session:
-        nodes_in_registration = session.scalars(select(WeighingNode.registration_in_progress == True)).all()
+        nodes_in_registration = session.scalars(select(WeighingNode).where(WeighingNode.registration_in_progress == True)).all()
         nodes_in_registration = list(map(lambda t: t.registration_in_progress_view(), nodes_in_registration))
         nodes_in_registration.sort(key=lambda t: t["created_at"])
         response = jsonify(nodes_in_registration)

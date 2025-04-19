@@ -10,7 +10,7 @@ Config.useConfig(Environment.DEVELOPMENT)
 DatabaseEngineProvider.load_default_database()
 
 server = Flask(__name__)
-CORS(server, origins="http://localhost:5173")
+CORS(server, origins=Config.FRONTEND_BASE_URL)
 
 # register blueprints here
 server.register_blueprint(weighing_node_blueprint, url_prefix="/weighing-nodes")

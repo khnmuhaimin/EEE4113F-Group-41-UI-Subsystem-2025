@@ -20,6 +20,7 @@ class Config:
     USE_CUSTOM_SUBDOMAIN: bool | None = None
     SUBDOMAIN: str | None = None
     DATABASE_PATH: str | None = None
+    FRONTEND_BASE_URL: str | None
 
     @classmethod
     def get(cls, config_option: str) -> str | None:
@@ -38,6 +39,7 @@ class Config:
             cls.USE_CUSTOM_SUBDOMAIN = False
             cls.SUBDOMAIN = None
             cls.DATABASE_PATH = ":memory:"
+            cls.FRONTEND_BASE_URL = "http://localhost:5173"
         
         elif env == Environment.DEMO:
             cls.USE_CUSTOM_SUBDOMAIN = True
