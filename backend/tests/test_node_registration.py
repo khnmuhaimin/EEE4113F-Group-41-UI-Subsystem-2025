@@ -159,7 +159,7 @@ def test_unsuccessful_approval_of_weighing_node_registration_due_to_missing_id(d
 def test_unsuccessful_approval_of_weighing_node_registration_due_to_invalid_id(weighing_node_id, default_admin_client: FlaskClient, database_engine: Engine):
     response = default_admin_client.post(
         "/weighing-nodes/registration/approve",
-        json={"weighing_node_id": 23434}
+        json={"weighing_node_id": weighing_node_id}
     )
     assert response.status_code == 422
     assert response.json["message"] == "The weighing node's ID is invalid."
