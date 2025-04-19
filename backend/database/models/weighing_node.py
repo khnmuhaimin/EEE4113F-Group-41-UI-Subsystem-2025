@@ -1,0 +1,21 @@
+from uuid import UUID, uuid4
+from sqlalchemy import BigInteger, ForeignKey, String
+from backend.database.models.base import Base
+from sqlalchemy.orm import Mapped, mapped_column
+
+from backend.database.utils.utils import utc_timestamp
+
+
+
+class WeighingNode(Base):
+    __tablename__ = "weighing_nodes"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    uuid: Mapped[UUID] = mapped_column(default=uuid4)
+    ip_address: Mapped[str] = mapped_column(String(39))  # to enable two-way communication during registration. can be null afterwards.
+    location: Mapped[str | None] = mapped_column(String(50))  # null during registration
+    registration_in_progress: Mapped[bool] = mapped_column(default=True)
+    leds_flashing: Mapped[bool] = mapped_column(default=False)
+    api_key: str = None
+    hashed_api_key: Mapped[str | None] = mapped_column(String(64))
+    created_at: Mapped[int] = mapped_column(BigInteger, default=utc_timestamp)
