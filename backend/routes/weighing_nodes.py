@@ -80,6 +80,35 @@ def update_ip_address():
     return ("", HTTPStatus.NO_CONTENT)
 
 
+@weighing_node_blueprint.route("/flash-leds", methods=["PUT"], endpoint="make_node_flash_leds")
+@authenticate_with_session_id
+def make_node_flash_leds():
+    # perform validation checks
+    if "weighing_node_id" not in request.json:
+        return jsonify({"message": "The weighing node's ID is missing."}), HTTPStatus.BAD_REQUEST
+    if "flash_leds" not in request.json:
+        return jsonify({"message": "The flash LEDs flag is missing."}), HTTPStatus.BAD_REQUEST
+    node_id = request.json["weighing_node_id"]
+    try:
+        node_id = UUID(str(node_id))
+    except ValueError:
+        return jsonify({"message": "The weighing node's ID is invalid."}), HTTPStatus.UNPROCESSABLE_ENTITY
+    flash_leds = request.json["flash_leds"]
+    if not isinstance(flash_leds, bool):
+        return jsonify({"message": "The flash LEDs flag must be a boolean."}), HTTPStatus.UNPROCESSABLE_ENTITY
+    
+
+    with Session(DatabaseEngineProvider.get_database_engine()) as session:
+        node = session.scalar(select(WeighingNode).where(WeighingNode.uuid == node_id))
+        if node is None:
+            return jsonify({"message": "The weighing node was not found."}), HTTPStatus.NOT_FOUND
+        if flash_leds != node.leds_flashing:
+            node.leds_flashing = flash_leds
+            # TODO: send a signal to the node to actually flash the LEDs
+            session.commit()
+        return ("", HTTPStatus.NO_CONTENT)
+
+
 @weighing_node_blueprint.route("/registration/start", methods=["POST"], endpoint="start_registration")
 def start_registration():
     """
