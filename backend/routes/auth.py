@@ -66,7 +66,7 @@ def authenticate_with_session_id(func):
             return response
         
         try:
-            session_id = UUID(session_id)
+            session_id = UUID(str(session_id))
         except ValueError:
             response_body = {
                     "message": "The session ID is invalid."

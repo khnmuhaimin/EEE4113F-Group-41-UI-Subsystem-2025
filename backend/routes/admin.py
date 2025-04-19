@@ -75,7 +75,7 @@ def logout():
             - 204 No Content on successful logout.
     """
     session_id = request.cookies.get("session_id")
-    session_id = UUID(session_id)
+    session_id = UUID(str(session_id))
     with DatabaseSession(DatabaseEngineProvider.get_database_engine()) as database_session:
         admin_session = database_session.scalar(select(AdminSession).where(AdminSession.session_id == session_id))
         database_session.delete(admin_session)

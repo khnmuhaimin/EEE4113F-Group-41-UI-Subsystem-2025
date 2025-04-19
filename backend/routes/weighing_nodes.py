@@ -1,5 +1,5 @@
 from http import HTTPStatus
-import uuid
+from uuid import UUID
 from flask import Blueprint, jsonify, request
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -163,7 +163,7 @@ def approve_weighing_node_registration():
     """
     try:
         node_id = request.json["weighing_node_id"]
-        node_id = uuid(node_id)
+        node_id = UUID(str(node_id))
     except KeyError:
         response = jsonify({
             "message": "The weighing node's ID is missing."
