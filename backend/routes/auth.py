@@ -114,20 +114,16 @@ def authenticate_with_password(func):
             email = request_body["email"]
             password = request_body["password"]
         except KeyError:
-            response_body = {
-                "message": "Request body is missing login credentials."
-            }
-            return make_response(jsonify(response_body), HTTPStatus.BAD_REQUEST)
+            response_body = {"message": "Request body is missing login credentials."}
+            return jsonify(response_body), HTTPStatus.BAD_REQUEST
         
         # make sure login details are correct
         with Session(DatabaseEngineProvider.get_database_engine()) as session:
             admin = session.scalar(select(Admin).where(Admin.email == email))
             if (admin is None
                 or not is_password_correct(password, admin.hashed_password)):
-                response_body = {
-                    "message": "Unauthorized."
-                }
-                return make_response(jsonify(response_body), HTTPStatus.UNAUTHORIZED)
+                response_body = {"message": "Unauthorized."}
+                return jsonify(response_body), HTTPStatus.UNAUTHORIZED
             
         # execute inner function
         response = func(*args, **kwargs)
