@@ -1,12 +1,15 @@
 from enum import Enum, auto
 
-
 class Environment(Enum):
     DEVELOPMENT = auto()
     DEMO = auto()
 
     def __str__(self):
         return self.name
+
+    @classmethod
+    def values(cls):
+        return [str(e) for e in Environment]
 
 
 class Config:
@@ -45,3 +48,17 @@ class Config:
             cls.USE_CUSTOM_SUBDOMAIN = True
             cls.SUBDOMAIN = "eee4113f-group-41-penguin-weighing"
             cls.DATABASE_PATH = "database.sqlite"
+
+    @classmethod
+    def dotenv_format(cls):
+        env_variables = []
+        for var, value in cls.__dict__.items():
+            if var != var.upper():
+                continue
+            if var.startswith("__") and var.endswith("__"):
+                continue
+            env_variables.append(f"{var}={value}")
+        
+        result = "\n".join(env_variables)
+        return result
+
