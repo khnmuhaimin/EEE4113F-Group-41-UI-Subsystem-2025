@@ -1,4 +1,5 @@
 import os
+import sys
 from dotenv import load_dotenv
 
 from config import Config, Environment
@@ -17,4 +18,8 @@ def print_config():
 
 
 if __name__ == "__main__":
-    print_config()
+    try:
+        print_config()
+    except Exception as e:
+        print(e)
+        sys.exit(1)
