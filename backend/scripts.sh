@@ -17,7 +17,13 @@ load_env() {
     fi
     source .venv/bin/activate
     pip install -r requirements.txt -qq
-    eval "$(python config/print_env_variables.py)"
+    print_env_variables_output="$(python config/print_env_variables.py)"
+    if [[ $? == 0 ]]; then
+        eval "$print_env_variables_output"
+    else
+        echo "$print_env_variables_output"
+        exit 1
+    fi
 }
 
 case $1 in
