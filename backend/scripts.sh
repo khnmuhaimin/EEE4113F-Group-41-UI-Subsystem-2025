@@ -9,26 +9,25 @@ if [[ $# -eq 0 ]]; then
     echo "$help_message"
 fi
 
-if [[ ! -f .env ]]; then
-    echo 'No .env file found. A .env template is being generated.'
-    echo 'Complete it and try again.'
-    exit 0
-fi
-
 source .env
+
+load_env() {
+    if [[ ! -d '.venv' ]]; then
+        python3 -m venv .venv
+    fi
+    source .venv/bin/activate
+    pip install -r requirements.txt -qq
+    eval "$(python config/print_env_variables.py)"
+}
 
 case $1 in
     start-server)
-        if [[ ! -d '.venv' ]]; then
-            python3 -m venv .venv
-        fi
-        source .venv/bin/activate
-        # pip install -r requirements.txt -qq
+        load_env
         gunicorn_count=$(ps aux | grep 'gunicorn server.server:server' | grep -v grep | wc -l)
         if [[ $gunicorn_count -ne 0 ]]; then
             echo 'The server is already running.'
         else
-            if [[ $SERVER_MODE == 'DEBUG' ]]; then
+            if [[ $ENVIRONMENT == 'DEVELOPMENT' ]]; then
                 log_level="DEBUG"
             else
                 log_level="INFO"
@@ -52,13 +51,14 @@ case $1 in
         ./scripts.sh start-server
         ;;
     start-tunnel)
+        load_env
         lt_counts=$(ps aux | grep 'npm exec lt' | grep -v grep | wc -l)
         if [[ $lt_counts -ne 0 ]]; then
             echo 'LocalTunnel is already running.'
             echo 'See localtunnel-logs.txt for logs.'
         else
             npm install --silent
-            if [[ $SERVER_MODE == 'DEMO' ]]; then
+            if [[ $ENVIRONMENT == 'DEMO' ]]; then
                 npx lt --port $PORT --subdomain $DOMAIN --https > localtunnel-logs.txt 2>&1 &
                 echo "Requests to $DOMAIN.loca.lt are being redirected to the port $PORT."
                 echo 'See localtunnel-logs.txt for logs.'
