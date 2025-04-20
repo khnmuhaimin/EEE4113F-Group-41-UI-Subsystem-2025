@@ -4,3 +4,4 @@
 node_modules/
 localtunnel-logs.txt
 server-logs.txt
+.env
