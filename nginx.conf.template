@@ -5,10 +5,10 @@ http {
     types_hash_max_size 4096;
 
     server {
-        listen 8002;
+        listen $NGINX_PORT;
 
         location /api/ {
-            proxy_pass http://localhost:8000/;
+            proxy_pass http://localhost:$SERVER_PORT/;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -16,7 +16,7 @@ http {
         }
 
         location / {
-            proxy_pass http://localhost:8001/;
+            proxy_pass http://localhost:$UI_PORT/;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

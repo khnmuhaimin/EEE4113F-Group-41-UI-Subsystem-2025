@@ -29,7 +29,7 @@ export const loginAsAdmin = async (email: string, password: string): Promise<Res
  * @returns {Promise<Response>} The response object from the server.
  */
 export const logoutAsAdmin = async (): Promise<Response> => {
-    const response = await fetch(`${BASE_URL}/admin/logout`, {
+    const response = await fetch(`${BASE_URL}/admins/logout`, {
         method: "POST",
         credentials: "include"  // ensures cookies are sent
     });

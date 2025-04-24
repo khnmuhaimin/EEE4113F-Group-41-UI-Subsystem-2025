@@ -10,6 +10,7 @@ from database.models.weighing_node import WeighingNode
 from database.database import DatabaseEngineProvider
 from database.models.session import DEFAULT_SESSION_DURATION, Session as AdminSession
 from database.utils.utils import utc_timestamp
+from log.log import logger
 
 
 def authenticate_weighing_node(func):
@@ -62,8 +63,7 @@ def authenticate_with_session_id(func):
             response_body = {
                 "message": "The session ID cookie is missing."
             }
-            response = make_response(jsonify(response_body), HTTPStatus.BAD_REQUEST)
-            return response
+            return jsonify(response_body), HTTPStatus.BAD_REQUEST
         
         try:
             session_id = UUID(str(session_id))
@@ -71,8 +71,8 @@ def authenticate_with_session_id(func):
             response_body = {
                     "message": "The session ID is invalid."
                 }
-            response = make_response(jsonify(response_body), HTTPStatus.UNPROCESSABLE_ENTITY)
-            return response
+            return jsonify(response_body), HTTPStatus.UNPROCESSABLE_ENTITY
+        
         with Session(DatabaseEngineProvider.get_database_engine()) as session:
             # make sure the session ID exists in the database
             admin_session = session.scalar(select(AdminSession).where(AdminSession.session_id == session_id))
@@ -120,6 +120,7 @@ def authenticate_with_password(func):
         # make sure login details are correct
         with Session(DatabaseEngineProvider.get_database_engine()) as session:
             admin = session.scalar(select(Admin).where(Admin.email == email))
+            logger.debug(admin)
             if (admin is None
                 or not is_password_correct(password, admin.hashed_password)):
                 response_body = {"message": "Unauthorized."}

@@ -1,11 +1,10 @@
-from sqlalchemy import create_engine
+from sqlalchemy import Engine, create_engine
+from sqlalchemy.orm import Session
+
+from auth.auth import hash_password
 from config.config import Config
 from database.models.base import Base
-# import all tables so they can be created
-from database.models.admin import *
-from database.models.session import *
-from database.models.weighing_node import *
-from database.models.weight_reading import *
+from database.models import admin, session, weighing_node, weight_reading  # import all tables so they can be created
 
 
 class DatabaseEngineProvider:
@@ -27,3 +26,17 @@ class DatabaseEngineProvider:
     @classmethod
     def load_default_database(cls):
         cls.get_database_engine()
+
+
+class DefaultDataProvider:
+
+    @classmethod
+    def load_default_admin(cls, engine: Engine):
+        with Session(engine) as session:
+            default_admin = admin.Admin(
+                name=Config.ADMIN_NAME,
+                email=Config.ADMIN_EMAIL,
+                hashed_password=hash_password(Config.ADMIN_PASSWORD)
+            )
+            session.add(default_admin)
+            session.commit()

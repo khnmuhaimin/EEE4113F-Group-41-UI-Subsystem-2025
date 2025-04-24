@@ -1,4 +1,8 @@
 from enum import Enum, auto
+import os
+
+from dotenv import load_dotenv
+load_dotenv()
 
 class Environment(Enum):
     DEVELOPMENT = auto()
@@ -6,59 +10,27 @@ class Environment(Enum):
 
     def __str__(self):
         return self.name
-
+    
     @classmethod
-    def values(cls):
-        return [str(e) for e in Environment]
+    def parse(cls, string: str):
+        try:
+            return cls[string.upper()]
+        except KeyError:
+            raise ValueError(f"Invalid environment: {string}")
 
 
 class Config:
 
-    ENVIRONMENT: Environment | None = None
-    PORT: int | None = None
-    PRESHARED_KEY: str | None = None
-    ADMIN_NAME: str | None = None
-    ADMIN_EMAIL: str | None = None
-    ADMIN_PASSWORD: str | None = None
-    USE_CUSTOM_SUBDOMAIN: bool | None = None
-    SUBDOMAIN: str | None = None
-    DATABASE_PATH: str | None = None
-    FRONTEND_BASE_URL: str | None
+    ENVIRONMENT = Environment.parse(os.environ["ENVIRONMENT"])
+    SERVER_PORT = int(os.environ["SERVER_PORT"])
+    UI_PORT = int(os.environ["UI_PORT"])
+    NGINX_PORT = int(os.environ["NGINX_PORT"])
+    PRESHARED_KEY = os.environ["PRESHARED_KEY"]
+    ADMIN_NAME = os.environ["ADMIN_NAME"]
+    ADMIN_EMAIL = os.environ["ADMIN_EMAIL"]
+    ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
+    USE_CUSTOM_SUBDOMAIN = os.environ["USE_CUSTOM_SUBDOMAIN"] == "true"
+    SUBDOMAIN = os.environ["SUBDOMAIN"]
+    DATABASE_PATH = os.environ["DATABASE_PATH"]
 
-    @classmethod
-    def get(cls, config_option: str) -> str | None:
-        return getattr(cls, config_option)
-
-    @classmethod
-    def useConfig(cls, env: Environment):
-        cls.ENVIRONMENT = env
-        cls.PORT = 8000
-        cls.PRESHARED_KEY = "PRESHARED_KEY"
-        cls.ADMIN_NAME="admin"
-        cls.ADMIN_EMAIL="admin@org.com"
-        cls.ADMIN_PASSWORD="admin"
-
-        if env == Environment.DEVELOPMENT:
-            cls.USE_CUSTOM_SUBDOMAIN = False
-            cls.SUBDOMAIN = None
-            cls.DATABASE_PATH = ":memory:"
-            cls.FRONTEND_BASE_URL = "http://localhost:5173"
         
-        elif env == Environment.DEMO:
-            cls.USE_CUSTOM_SUBDOMAIN = True
-            cls.SUBDOMAIN = "eee4113f-group-41-penguin-weighing"
-            cls.DATABASE_PATH = "database.sqlite"
-
-    @classmethod
-    def dotenv_format(cls):
-        env_variables = []
-        for var, value in cls.__dict__.items():
-            if var != var.upper():
-                continue
-            if var.startswith("__") and var.endswith("__"):
-                continue
-            env_variables.append(f"{var}={value}")
-        
-        result = "\n".join(env_variables)
-        return result
-

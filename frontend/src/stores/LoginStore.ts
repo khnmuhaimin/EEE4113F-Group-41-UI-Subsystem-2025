@@ -39,7 +39,7 @@ export const useLoginStore = defineStore("login", () => {
                 // if login was successful
                 status.value = LoginStatus.LOGGED_IN
                 const userStore = useUserStore()
-                userStore.setAdminDetails(response_body["name"], response_body["email"])
+                userStore.setAdminDetails(response_body["name"], email)
             } else {
                 // if login failed due to a known reason
                 status.value = previousStatus

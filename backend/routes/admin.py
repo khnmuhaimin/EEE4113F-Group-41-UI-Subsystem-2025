@@ -4,6 +4,7 @@ from flask import Blueprint, jsonify, make_response, request
 from sqlalchemy import select
 from sqlalchemy.orm import Session as DatabaseSession
 
+from config.config import Config, Environment
 from routes.auth import authenticate_with_password, authenticate_with_session_id
 from database.database import DatabaseEngineProvider
 from database.models.admin import Admin
@@ -56,7 +57,8 @@ def login():
             str(admin_session.session_id),
             expires=admin_session.expires_at, 
             httponly=True,
-            secure=True
+            secure=Config.ENVIRONMENT == Environment.DEMO,
+            samesite="None"
         )
         return response
 
