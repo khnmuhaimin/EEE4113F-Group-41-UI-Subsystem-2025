@@ -19,7 +19,7 @@ start_reverse_proxy_server() {
     fi
 
     # shellcheck disable=SC2016
-    envsubst '${REVERSE_PROXY_PORT} ${SERVER_PORT} ${UI_PORT}' < "$nginx_template_path" > "$nginx_conf_path"
+    envsubst '${PROJECT_DIR} ${REVERSE_PROXY_PORT} ${SERVER_PORT} ${UI_PORT}' < "$nginx_template_path" > "$nginx_conf_path"
     if ! nginx -t -c "$nginx_conf_path"; then
         fail "Nginx config test failed."
         return 1

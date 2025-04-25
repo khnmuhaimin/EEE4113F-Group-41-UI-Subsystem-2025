@@ -40,9 +40,9 @@ start_localtunnel() {
 
     # get command
     if [[ "$ENVIRONMENT" == DEMO ]]; then
-        local start_command="npx lt --port $NGINX_PORT --subdomain $SUBDOMAIN --https"
+        local start_command="npx lt --port $REVERSE_PROXY_PORT --subdomain $SUBDOMAIN --https"
     else
-        local start_command="npx lt --port $NGINX_PORT --https"
+        local start_command="npx lt --port $REVERSE_PROXY_PORT --https"
     fi
 
     # if startup is successful, print messages

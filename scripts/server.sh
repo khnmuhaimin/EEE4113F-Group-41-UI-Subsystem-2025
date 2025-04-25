@@ -21,7 +21,6 @@ setup_backend_venv() {
     fi
     # Install dependencies quietly
     if [[ -f "$requirements_file" ]]; then
-        log "Installing Python dependencies from $requirements_file..."
         pip install -r "$requirements_file" -qq
     else
         fail "Requirements file not found: $requirements_file"

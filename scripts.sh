@@ -5,9 +5,9 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export PROJECT_DIR
 
 # shellcheck disable=SC2034
-TRUE=1
+TRUE=TRUE
 # shellcheck disable=SC2034
-FALSE=0
+FALSE=FALSE
 # shellcheck disable=SC2034
 SERVER_PROCESS_TAG=SERVER
 # shellcheck disable=SC2034
@@ -41,6 +41,18 @@ main() {
     log "Environment setup complete."
 
     case $1 in
+        start)
+            "$PROJECT_DIR"/scripts.sh start-server
+            "$PROJECT_DIR"/scripts.sh start-ui
+            "$PROJECT_DIR"/scripts.sh start-proxy
+            "$PROJECT_DIR"/scripts.sh start-tunnel
+        ;;
+        stop)
+            "$PROJECT_DIR"/scripts.sh stop-server
+            "$PROJECT_DIR"/scripts.sh stop-ui
+            "$PROJECT_DIR"/scripts.sh stop-proxy
+            "$PROJECT_DIR"/scripts.sh stop-tunnel
+        ;;
         start-server)
             setup_backend_venv
             start_server

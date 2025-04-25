@@ -3,9 +3,10 @@ events {}
 http {
 
     types_hash_max_size 4096;
+    error_log $PROJECT_DIR/logs/NGINX.log;
 
     server {
-        listen $NGINX_PORT;
+        listen $REVERSE_PROXY_PORT;
 
         location /api/ {
             proxy_pass http://localhost:$SERVER_PORT/;

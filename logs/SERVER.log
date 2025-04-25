@@ -1,4 +1,4 @@
-[2025-04-24 19:09:36 +0200] [1722498] [DEBUG] Current configuration:
+[2025-04-25 06:44:40 +0200] [1831259] [DEBUG] Current configuration:
   config: ./gunicorn.conf.py
   wsgi_app: None
   bind: ['0.0.0.0:8000']
@@ -58,22 +58,22 @@
   default_proc_name: server.server:server
   pythonpath: None
   paste: None
-  on_starting: <function OnStarting.on_starting at 0x7ff5d1a9c5e0>
-  on_reload: <function OnReload.on_reload at 0x7ff5d1a9c700>
-  when_ready: <function WhenReady.when_ready at 0x7ff5d1a9c820>
-  pre_fork: <function Prefork.pre_fork at 0x7ff5d1a9c940>
-  post_fork: <function Postfork.post_fork at 0x7ff5d1a9ca60>
-  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7ff5d1a9cb80>
-  worker_int: <function WorkerInt.worker_int at 0x7ff5d1a9cca0>
-  worker_abort: <function WorkerAbort.worker_abort at 0x7ff5d1a9cdc0>
-  pre_exec: <function PreExec.pre_exec at 0x7ff5d1a9cee0>
-  pre_request: <function PreRequest.pre_request at 0x7ff5d1a9d000>
-  post_request: <function PostRequest.post_request at 0x7ff5d1a9d090>
-  child_exit: <function ChildExit.child_exit at 0x7ff5d1a9d1b0>
-  worker_exit: <function WorkerExit.worker_exit at 0x7ff5d1a9d2d0>
-  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7ff5d1a9d3f0>
-  on_exit: <function OnExit.on_exit at 0x7ff5d1a9d510>
-  ssl_context: <function NewSSLContext.ssl_context at 0x7ff5d1a9d630>
+  on_starting: <function OnStarting.on_starting at 0x76dad8a685e0>
+  on_reload: <function OnReload.on_reload at 0x76dad8a68700>
+  when_ready: <function WhenReady.when_ready at 0x76dad8a68820>
+  pre_fork: <function Prefork.pre_fork at 0x76dad8a68940>
+  post_fork: <function Postfork.post_fork at 0x76dad8a68a60>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x76dad8a68b80>
+  worker_int: <function WorkerInt.worker_int at 0x76dad8a68ca0>
+  worker_abort: <function WorkerAbort.worker_abort at 0x76dad8a68dc0>
+  pre_exec: <function PreExec.pre_exec at 0x76dad8a68ee0>
+  pre_request: <function PreRequest.pre_request at 0x76dad8a69000>
+  post_request: <function PostRequest.post_request at 0x76dad8a69090>
+  child_exit: <function ChildExit.child_exit at 0x76dad8a691b0>
+  worker_exit: <function WorkerExit.worker_exit at 0x76dad8a692d0>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x76dad8a693f0>
+  on_exit: <function OnExit.on_exit at 0x76dad8a69510>
+  ssl_context: <function NewSSLContext.ssl_context at 0x76dad8a69630>
   proxy_protocol: False
   proxy_allow_ips: ['127.0.0.1', '::1']
   keyfile: None
@@ -92,40 +92,15 @@
   casefold_http_method: False
   forwarder_headers: ['SCRIPT_NAME', 'PATH_INFO']
   header_map: drop
-[2025-04-24 19:09:36 +0200] [1722498] [INFO] Starting gunicorn 23.0.0
-[2025-04-24 19:09:36 +0200] [1722498] [DEBUG] Arbiter booted
-[2025-04-24 19:09:36 +0200] [1722498] [INFO] Listening at: http://0.0.0.0:8000 (1722498)
-[2025-04-24 19:09:36 +0200] [1722498] [INFO] Using worker: sync
-[2025-04-24 19:09:36 +0200] [1722532] [INFO] Booting worker with pid: 1722532
-[2025-04-24 19:09:36 +0200] [1722498] [DEBUG] 1 workers
-[2025-04-24 19:09:37 +0200] [1722532] [ERROR] Exception in worker process
-Traceback (most recent call last):
-  File "/home/khnmuhaimin/EEE4113F/EEE4113F-Group-41-UI-Subsystem-2025/backend/.venv/lib/python3.10/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
-    worker.init_process()
-  File "/home/khnmuhaimin/EEE4113F/EEE4113F-Group-41-UI-Subsystem-2025/backend/.venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 135, in init_process
-    self.load_wsgi()
-  File "/home/khnmuhaimin/EEE4113F/EEE4113F-Group-41-UI-Subsystem-2025/backend/.venv/lib/python3.10/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
-    self.wsgi = self.app.wsgi()
-  File "/home/khnmuhaimin/EEE4113F/EEE4113F-Group-41-UI-Subsystem-2025/backend/.venv/lib/python3.10/site-packages/gunicorn/app/base.py", line 66, in wsgi
-    self.callable = self.load()
-  File "/home/khnmuhaimin/EEE4113F/EEE4113F-Group-41-UI-Subsystem-2025/backend/.venv/lib/python3.10/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
-    return self.load_wsgiapp()
-  File "/home/khnmuhaimin/EEE4113F/EEE4113F-Group-41-UI-Subsystem-2025/backend/.venv/lib/python3.10/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
-    return util.import_app(self.app_uri)
-  File "/home/khnmuhaimin/EEE4113F/EEE4113F-Group-41-UI-Subsystem-2025/backend/.venv/lib/python3.10/site-packages/gunicorn/util.py", line 370, in import_app
-    mod = importlib.import_module(module)
-  File "/home/khnmuhaimin/.pyenv/versions/3.10.13/lib/python3.10/importlib/__init__.py", line 126, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
-  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
-  File "/home/khnmuhaimin/EEE4113F/EEE4113F-Group-41-UI-Subsystem-2025/backend/server/server.py", line 11, in <module>
-    Config.useConfig()
-AttributeError: type object 'Config' has no attribute 'useConfig'
-[2025-04-24 19:09:37 +0200] [1722532] [INFO] Worker exiting (pid: 1722532)
-[2025-04-24 19:09:37 +0200] [1722498] [ERROR] Worker (pid:1722532) exited with code 3
-[2025-04-24 19:09:37 +0200] [1722498] [ERROR] Shutting down: Master
-[2025-04-24 19:09:37 +0200] [1722498] [ERROR] Reason: Worker failed to boot.
+[2025-04-25 06:44:40 +0200] [1831259] [INFO] Starting gunicorn 23.0.0
+[2025-04-25 06:44:40 +0200] [1831259] [DEBUG] Arbiter booted
+[2025-04-25 06:44:40 +0200] [1831259] [INFO] Listening at: http://0.0.0.0:8000 (1831259)
+[2025-04-25 06:44:40 +0200] [1831259] [INFO] Using worker: sync
+[2025-04-25 06:44:40 +0200] [1831297] [INFO] Booting worker with pid: 1831297
+[2025-04-25 06:44:40 +0200] [1831259] [DEBUG] 1 workers
+[2025-04-25 06:44:40 +0200] [1831297] [INFO] The server is running in the DEVELOPMENT environment.
+[2025-04-25 06:48:04 +0200] [1831297] [DEBUG] GET /
+127.0.0.1 - - [25/Apr/2025:06:48:04 +0200] "GET / HTTP/1.0" 200 13 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:137.0) Gecko/20100101 Firefox/137.0"
+[2025-04-25 06:51:54 +0200] [1831259] [INFO] Handling signal: term
+[2025-04-25 06:51:54 +0200] [1831297] [INFO] Worker exiting (pid: 1831297)
+[2025-04-25 06:51:54 +0200] [1831259] [INFO] Shutting down: Master
