@@ -31,7 +31,15 @@ start_process() {
 
     nohup bash -c "$command" &> "$LOG_PATH" &  # run in a new shell
     PID=$!
-    echo "$PID" > "$PID_DIR"  # store the PID
+    if [[ "$command" != *nginx* ]]; then
+        # the command used to start nginx is actually the command to
+        # start the LAUNCHER for nginx. If we store nginx's pid using
+        # the line below, we'll be storing the pid of the laucnher.
+        # Instead, in the nginx.conf.template (and nginx.conf), there
+        # is a line to tell nginx to log its pid to REVERSE_PROXY.pid
+
+        echo "$PID" > "$PID_DIR"  # store the PID
+    fi
     
     return 0
 }
@@ -56,8 +64,8 @@ start_process() {
 #   - 1 (Failure): The PID file does not exist, the PID could not be read, or the process
 #                 could not be terminated.
 stop_process() {
-    local process_name="$1"
-    local pid_file="$PROJECT_DIR/pids/$process_name.pid"
+    local process_tag="$1"
+    local pid_file="$PROJECT_DIR/pids/$process_tag.pid"
 
     # Check if the PID file exists
     if [[ -f "$pid_file" ]]; then
@@ -118,6 +126,7 @@ process_running() {
     else
         # shellcheck disable=SC2034
         RUNNING="$FALSE"
+
     fi
     return 0
 }

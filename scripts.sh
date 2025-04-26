@@ -14,8 +14,8 @@ SERVER_PROCESS_TAG=SERVER
 UI_PROCESS_TAG=UI
 # shellcheck disable=SC2034
 LOCALTUNNEL_PROCESS_TAG=LOCALTUNNEL
-# shellcheck disable=SC2034
-REVERSE_PROXY_PROCESS_TAG=REVERSE_PROXY
+# nginx.conf needs this so we'll export it
+export REVERSE_PROXY_PROCESS_TAG=REVERSE_PROXY
 
 # ---- Importing all scripts
 for script in "$PROJECT_DIR"/scripts/*.sh; do

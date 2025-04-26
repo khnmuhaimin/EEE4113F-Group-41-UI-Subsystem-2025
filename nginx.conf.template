@@ -1,3 +1,5 @@
+pid $PROJECT_DIR/pids/$REVERSE_PROXY_PROCESS_TAG.pid;
+
 events {}
 
 http {

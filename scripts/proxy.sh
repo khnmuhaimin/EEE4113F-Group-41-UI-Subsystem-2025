@@ -19,14 +19,14 @@ start_reverse_proxy_server() {
     fi
 
     # shellcheck disable=SC2016
-    envsubst '${PROJECT_DIR} ${REVERSE_PROXY_PORT} ${SERVER_PORT} ${UI_PORT}' < "$nginx_template_path" > "$nginx_conf_path"
+    envsubst '${PROJECT_DIR} ${REVERSE_PROXY_PROCESS_TAG} ${REVERSE_PROXY_PORT} ${SERVER_PORT} ${UI_PORT}' < "$nginx_template_path" > "$nginx_conf_path"
     if ! nginx -t -c "$nginx_conf_path"; then
         fail "Nginx config test failed."
         return 1
     fi
 
     local start_command
-    start_command="sudo nginx -c $PROJECT_DIR/nginx.conf"
+    start_command="nginx -c $PROJECT_DIR/nginx.conf"
 
     # if successful, print messages
     if start_process "$REVERSE_PROXY_PROCESS_TAG" "$start_command"; then
@@ -43,6 +43,7 @@ start_reverse_proxy_server() {
 stop_reverse_proxy_server() {
     # noop if the server is running
     process_running "$REVERSE_PROXY_PROCESS_TAG"
+    log "ARE WE RUNNING: $RUNNING"
     if [[ "$RUNNING" == "$FALSE" ]]; then
         log "The reverse proxy server was not running."
         return 0
