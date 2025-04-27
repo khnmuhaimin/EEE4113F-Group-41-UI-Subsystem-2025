@@ -13,9 +13,7 @@ SERVER_PROCESS_TAG=SERVER
 # shellcheck disable=SC2034
 UI_PROCESS_TAG=UI
 # shellcheck disable=SC2034
-LOCALTUNNEL_PROCESS_TAG=LOCALTUNNEL
-# nginx.conf needs this so we'll export it
-export REVERSE_PROXY_PROCESS_TAG=REVERSE_PROXY
+CLOUDFLARED_PROCESS_TAG=CLOUDFLARED
 
 # ---- Importing all scripts
 for script in "$PROJECT_DIR"/scripts/*.sh; do
@@ -42,16 +40,17 @@ main() {
 
     case $1 in
         start)
+            "$PROJECT_DIR"/scripts.sh start-tunnel
+            "$PROJECT_DIR"/scripts.sh export-url
             "$PROJECT_DIR"/scripts.sh start-server
             "$PROJECT_DIR"/scripts.sh start-ui
             "$PROJECT_DIR"/scripts.sh start-proxy
-            "$PROJECT_DIR"/scripts.sh start-tunnel
         ;;
         stop)
+            "$PROJECT_DIR"/scripts.sh stop-tunnel
             "$PROJECT_DIR"/scripts.sh stop-server
             "$PROJECT_DIR"/scripts.sh stop-ui
             "$PROJECT_DIR"/scripts.sh stop-proxy
-            "$PROJECT_DIR"/scripts.sh stop-tunnel
         ;;
         start-server)
             setup_backend_venv
@@ -68,23 +67,10 @@ main() {
             stop_ui_server
         ;;
         start-tunnel)
-            setup_localtunnel
-            start_localtunnel
+            start_cloudflared
         ;;
         stop-tunnel)
-            stop_localtunnel
-        ;;
-        get-tunnel-password)
-            get_tunnel_password
-        ;;
-        get-domain)
-            get_domain
-        ;;
-        start-proxy)
-            start_reverse_proxy_server
-        ;;
-        stop-proxy)
-            stop_reverse_proxy_server
+            stop_cloudflared
         ;;
         *)
             print_help_message  

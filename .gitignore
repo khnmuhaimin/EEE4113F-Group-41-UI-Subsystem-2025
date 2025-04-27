@@ -12,4 +12,4 @@ nginx.conf
 
 logs
 pids
-
+cloudflared

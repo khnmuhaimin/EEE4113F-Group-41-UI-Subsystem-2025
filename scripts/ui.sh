@@ -34,16 +34,11 @@ start_ui_server() {
         return 0
     fi
 
-    local current_dir
-    current_dir="$(pwd)"  # jump back at the end of the function
-    trap 'cd "$current_dir" || exit 1' EXIT
-
     # setup the ui by installing deps
     setup_ui_server || exit 1
 
-    cd "$PROJECT_DIR"/frontend || exit 1
     local start_command
-    start_command="vite --port $UI_PORT"
+    start_command="$PROJECT_DIR/frontend/node_modules/.bin/vite serve $PROJECT_DIR/frontend --port $UI_PORT"
     # if startup is successful, print messages
     if start_process "$UI_PROCESS_TAG" "$start_command"; then
         log "Started the UI server."

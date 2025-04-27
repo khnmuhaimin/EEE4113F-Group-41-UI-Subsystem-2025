@@ -7,7 +7,7 @@
 # Usage:
 #   print_help_message
 print_help_message() {
-    local options="help, start-server, stop-server, start-tunnel, stop-tunnel, get-tunnel-password, get-domain, start-proxy, stop-proxy"
+    local options="help, start-server, stop-server, start-ui, stop-ui, start-tunnel, stop-tunnel"
     
     local help_message="This .sh file contains some helpful scripts.
     
