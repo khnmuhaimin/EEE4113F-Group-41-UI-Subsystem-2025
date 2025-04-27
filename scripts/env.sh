@@ -29,10 +29,10 @@ load_environment_specific_file() {
     local env_file
     case "$env" in
         DEVELOPMENT)
-            env_file="${PROJECT_DIR%/}/.env.development"
+            env_file="$PROJECT_DIR/.env.development"
             ;;
         DEMO)
-            env_file="${PROJECT_DIR%/}/.env.demo"
+            env_file="$PROJECT_DIR/.env.demo"
             ;;
         *)
             fail "ENVIRONMENT must be set to either DEVELOPMENT or DEMO."
