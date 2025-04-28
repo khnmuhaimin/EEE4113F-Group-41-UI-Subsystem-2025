@@ -27,6 +27,13 @@ done
 loadColors
 
 
+function setup_environment_variables() {
+    # Setting up environment variables
+    load_env_file "${PROJECT_DIR}"/.env
+    load_environment_specific_file "$ENVIRONMENT"
+}
+
+
 main() {
 
     # print help message if exactly zero or more than 1 arguments were given
@@ -35,19 +42,16 @@ main() {
         exit 0
     fi
 
-    # Setting up environment variables
-    debug "Exporting base environment variables..."
-    load_env_file "${PROJECT_DIR}"/.env
-    load_environment_specific_file "$ENVIRONMENT"
-    debug "Environment setup complete."
 
     case $1 in
         start)
+            setup_environment_variables
             "$PROJECT_DIR"/scripts.sh start-server
             "$PROJECT_DIR"/scripts.sh start-ui
             "$PROJECT_DIR"/scripts.sh start-tunnel
         ;;
         stop)
+            setup_environment_variables
             "$PROJECT_DIR"/scripts.sh stop-server
             "$PROJECT_DIR"/scripts.sh stop-ui
             "$PROJECT_DIR"/scripts.sh stop-tunnel
