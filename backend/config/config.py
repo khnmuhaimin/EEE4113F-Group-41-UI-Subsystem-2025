@@ -29,8 +29,6 @@ class Config:
     ADMIN_NAME = os.environ["ADMIN_NAME"]
     ADMIN_EMAIL = os.environ["ADMIN_EMAIL"]
     ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
-    USE_CUSTOM_SUBDOMAIN = os.environ["USE_CUSTOM_SUBDOMAIN"] == "TRUE"
-    SUBDOMAIN = os.environ["SUBDOMAIN"]
     BASE_URL=f'https://{DOMAIN}'
     DATABASE_PATH = os.environ["DATABASE_PATH"]
 
