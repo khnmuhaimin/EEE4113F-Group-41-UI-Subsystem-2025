@@ -17,10 +17,10 @@ server = Flask(__name__)
 CORS(server, supports_credentials=True, origins=Config.BASE_URL)
 
 # register blueprints here
-server.register_blueprint(weighing_node_blueprint, url_prefix="/weighing-nodes")
-server.register_blueprint(admin_blueprint, url_prefix="/admins")
+server.register_blueprint(weighing_node_blueprint, url_prefix="/api/weighing-nodes")
+server.register_blueprint(admin_blueprint, url_prefix="/api/admins")
 
     
-@server.route('/')
+@server.route('/api')
 def index():
     return "Hello, World!"
