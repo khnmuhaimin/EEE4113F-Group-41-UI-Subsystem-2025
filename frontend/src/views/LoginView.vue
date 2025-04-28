@@ -8,31 +8,33 @@ const email = ref("")
 const password = ref("")
 const emailHelp = ref("")
 const passwordHelp = ref("")
+const loginMessage = ref("")
 const loginStore = useLoginStore()
 
-const formIsFilled = () => {
-  if (email.value === "") {
-    emailHelp.value = "Enter the email."
-  } else {
-    emailHelp.value = ""
-  }
-  if (password.value === "") {
-    passwordHelp.value = "Enter the password."
-  } else {
-    passwordHelp.value = ""
-  }
-  return email.value !== "" && password.value !== ""
-}
 
 const handleAdminLogin = async () => {
-
-  if (!formIsFilled()) {
-    return;
-  }
 
   await loginStore.login(email.value, password.value)
   if (loginStore.status === LoginStatus.LOGGED_IN) {
     router.push("/dashboard")
+  }
+
+  if (loginStore.emailError === "MISSING") {
+    emailHelp.value = "Enter the email address."
+  } else if (loginStore.emailError === "INVALID") {
+    emailHelp.value = "The email address is not valid."
+  } else if (loginStore.emailError === "INCORRECT" || loginStore.emailError === null) {
+    emailHelp.value = ""
+  }
+
+  if (loginStore.passwordError === "MISSING") {
+    passwordHelp.value = "Enter the password."
+  } else if (loginStore.passwordError === "INCORRECT" || loginStore.passwordError === null) {
+    passwordHelp.value = ""
+  }
+
+  if (loginStore.emailError === "INCORRECT" || loginStore.passwordError === "INCORRECT") {
+    loginMessage.value = "Are you sure your login details are correct?"
   }
 }
 
@@ -51,19 +53,19 @@ const handleGuestLogin = async() => {
     <div id="form-container" class="vertical-stack center-children my-3">
       <div id="email-container" class="vertical-stack center-children horizontal-fill my-3">
         <label id="email-label" for="email" class="form-label">Email:</label>
-        <input id="email" v-model="email" type="text" class="form-control"/>
+        <input id="email" v-model="email" type="text" class="form-control" :class="{ 'is-invalid': loginStore.emailError !== null }"/>
         <div id="email-help" class="form-text">{{ emailHelp }}</div>
       </div>
       <div id="password-container" class="vertical-stack center-children horizontal-fill my-3">
         <label id="password-label" for="password" class="form-label">Password:</label>
-        <input id="password" v-model="password" type="password" class="form-control"/>
+        <input id="password" v-model="password" type="password" class="form-control" :class="{ 'is-invalid': loginStore.passwordError !== null }"/>
         <div id="password-help" class="form-text">{{ passwordHelp }}</div>
       </div>
       <div class="vertical-stack horizontal-fill center-children my-3">
         <button id="admin-login-button" class="btn my-2" @click="handleAdminLogin" :disabled="loginStore.inProgress()">Login as Admin</button>
         <button id="guest-login-button" class="btn my-2" @click="handleGuestLogin" :disabled="loginStore.inProgress()">Continue As Guest</button>
       </div>
-      <div id="login-message"></div>
+      <div id="login-message">{{ loginMessage }}</div>
     </div>
   </div>
 </template>

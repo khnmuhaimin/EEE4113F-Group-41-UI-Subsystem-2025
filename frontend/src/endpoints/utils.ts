@@ -1,1 +1,1 @@
-export const API_BASE_URL = `https://${import.meta.env.DOMAIN}/api`
+export const API_BASE_URL = `https://${import.meta.env.VITE_DOMAIN}/api`

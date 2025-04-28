@@ -49,6 +49,8 @@ start_ui_server() {
         npm run build > "$PROJECT_DIR"/logs/UI-BUILD.log 2>&1
         start_command="$PROJECT_DIR/frontend/node_modules/.bin/vite preview $PROJECT_DIR/frontend --port $UI_PORT"
     fi
+    # export env vars needed by client
+    export VITE_DOMAIN="$DOMAIN"
     # if startup is successful, print messages
     if start_process "$UI_PROCESS_TAG" "$start_command"; then
         log "Starting the UI server."

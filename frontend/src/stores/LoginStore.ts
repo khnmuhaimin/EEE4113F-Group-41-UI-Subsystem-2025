@@ -10,6 +10,28 @@ import { useUserStore } from "@/stores/UserStore"
 export const useLoginStore = defineStore("login", () => {
     const status = ref(LoginStatus.LOGGED_OUT)
     const errorMessage = ref<string | null>(null)  // null means no error
+    const emailError = ref<"" | "MISSING" | "INVALID" | "INCORRECT" | null>(null)
+    const passwordError = ref<"" | "MISSING" | "INCORRECT" | null>(null)
+
+    const validateEmail = (email: string) => {
+        if (email === "") {
+            emailError.value = "MISSING"
+        } else if (!email.includes("@")) {
+            emailError.value = "INVALID"
+        } else {
+            emailError.value = null
+        }
+        return emailError.value === null;
+    }
+
+    const validatePassword = (password: string) => {
+        if (password === "") {
+            passwordError.value = "MISSING"
+        } else {
+            passwordError.value = null
+        }
+        return passwordError.value === null;
+    }
 
     /**
      * Attempts to log in a user as an admin.
@@ -28,6 +50,12 @@ export const useLoginStore = defineStore("login", () => {
         if (status.value == LoginStatus.LOGGING_IN || status.value == LoginStatus.LOGGING_OUT) {
             return  // do nothing to not complicate the logic
         }
+
+        validateEmail(email)
+        validatePassword(password)
+        if (emailError.value !== null || passwordError.value !== null) {
+            return
+        }
         // reset the login status
         const previousStatus = status.value
         status.value = LoginStatus.LOGGING_IN
@@ -40,8 +68,13 @@ export const useLoginStore = defineStore("login", () => {
                 status.value = LoginStatus.LOGGED_IN
                 const userStore = useUserStore()
                 userStore.setAdminDetails(response_body["name"], email)
-            } else {
+            } else if (response.status == 401){
                 // if login failed due to a known reason
+                status.value = previousStatus
+                errorMessage.value = response_body["message"]
+                emailError.value = "INCORRECT"
+                passwordError.value = "INCORRECT"
+            } else {
                 status.value = previousStatus
                 errorMessage.value = response_body["message"]
             }
@@ -96,5 +129,5 @@ export const useLoginStore = defineStore("login", () => {
         return status.value === LoginStatus.LOGGING_IN || status.value === LoginStatus.LOGGING_OUT
     }
 
-    return { status, errorMessage, login, logout, errorOccured, inProgress }
+    return { status, errorMessage, emailError, passwordError, login, logout, errorOccured, inProgress }
 })
