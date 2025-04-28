@@ -8,9 +8,10 @@
 /**/__pycache__
 /**/.pytest_cache
 
-nginx.conf
-
 logs
 pids
+
 cloudflared/*.json
 cloudflared/config.yml
+
+frontend/dist
