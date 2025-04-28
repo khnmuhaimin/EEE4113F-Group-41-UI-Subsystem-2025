@@ -20,13 +20,13 @@ setup_backend_venv() {
         exit 1
     fi
 
-    if [[ ! -f "$PROJECT_DIR"/requirements.txt ]]; then
-        fail "Couldn't find the dependency list at $PROJECT_DIR/requirements.txt."
+    if [[ ! -f "$PROJECT_DIR"/backend/requirements.txt ]]; then
+        fail "Couldn't find the dependency list at $PROJECT_DIR/backend/requirements.txt."
         exit 1
     fi
     
     dependencies="$(pip freeze)"
-    installed="$(cat "$PROJECT_DIR"/requirements.txt)"
+    installed="$(cat "$PROJECT_DIR"/backend/requirements.txt)"
     if [[ "$dependencies" != "$installed" ]]; then
         log "Installing dependencies."
         pip install -r "$requirements_file" -qq
@@ -49,7 +49,6 @@ start_server() {
 
 
     # start the server
-    setup_backend_venv || exit 1
     cd "${PROJECT_DIR}/backend" || exit 1
     if [[ "$ENVIRONMENT" == DEVELOPMENT ]]; then
         local log_level=DEBUG

@@ -34,9 +34,6 @@ start_ui_server() {
         return 0
     fi
 
-    # setup the ui by installing deps
-    setup_ui_server || exit 1
-
     local start_command
     start_command="$PROJECT_DIR/frontend/node_modules/.bin/vite serve $PROJECT_DIR/frontend --port $UI_PORT"
     # if startup is successful, print messages
