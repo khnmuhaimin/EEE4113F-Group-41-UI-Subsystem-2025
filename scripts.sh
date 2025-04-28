@@ -45,8 +45,7 @@ main() {
         exit 0
     fi
 
-
-    case $1 in
+    case "$1" in
         start)
             # shellcheck disable=SC1091
             . "$PROJECT_DIR"/scripts.sh start-server
