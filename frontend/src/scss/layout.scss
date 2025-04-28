@@ -1,0 +1,27 @@
+.fullscreen {
+    width: 100vw;
+    height: 100vh;
+}
+
+.vertical-stack {
+    display: flex;
+    flex-direction: column;
+    /* Stack vertically */
+}
+
+.horizontal-stack {
+    display: flex;
+    flex-direction: row;
+    /* Stack horizontally */
+}
+
+.center-children {
+    display: flex;
+    justify-content: center;
+    /* Centers horizontally */
+    align-items: center;
+}
+
+.horizontal-fill {
+    width: 100%;
+}

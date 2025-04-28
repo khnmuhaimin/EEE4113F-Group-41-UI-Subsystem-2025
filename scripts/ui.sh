@@ -34,8 +34,21 @@ start_ui_server() {
         return 0
     fi
 
+    local current_dir
+    current_dir="$(pwd)"  # jump back at the end of the function
+    trap 'cd "$current_dir" || exit 1' EXIT
+
+    cd "$PROJECT_DIR/frontend" || exit
+
     local start_command
-    start_command="$PROJECT_DIR/frontend/node_modules/.bin/vite serve $PROJECT_DIR/frontend --port $UI_PORT"
+    if [[ "$ENVIRONMENT" == "DEVELOPMENT" ]]; then
+        start_command="$PROJECT_DIR/frontend/node_modules/.bin/vite serve $PROJECT_DIR/frontend --port $UI_PORT"
+    else
+        debug "Building frontend files."
+        cd "$PROJECT_DIR"/frontend || exit 1
+        npm run build > "$PROJECT_DIR"/logs/UI-BUILD.log 2>&1
+        start_command="$PROJECT_DIR/frontend/node_modules/.bin/vite preview $PROJECT_DIR/frontend --port $UI_PORT"
+    fi
     # if startup is successful, print messages
     if start_process "$UI_PROCESS_TAG" "$start_command"; then
         log "Starting the UI server."
