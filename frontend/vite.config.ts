@@ -17,4 +17,9 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url))
     },
   },
+  server: {
+    allowedHosts: [
+      'eee4113f-group-41.online', // Add the allowed host here
+    ],
+  }
 })

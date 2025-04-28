@@ -23,6 +23,9 @@ for script in "$PROJECT_DIR"/scripts/*.sh; do
   fi
 done
 
+# load all color codes
+loadColors
+
 
 main() {
 
