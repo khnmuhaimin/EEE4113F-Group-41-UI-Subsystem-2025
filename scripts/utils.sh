@@ -39,6 +39,15 @@ function loadColors() {
     RESET='\033[0m'
 }
 
+
+# This function logs an debug message to the console with an [INFO] tag.
+#
+# Usage:
+#   log <message>
+debug() {
+    echo -e "${BRIGHT_BLACK}[DEBUG]$RESET $*"
+}
+
 # This function logs an informational message to the console with an [INFO] tag.
 #
 # Usage:

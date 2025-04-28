@@ -6,7 +6,7 @@ setup_backend_venv() {
 
     if [[ ! -d "$venv_dir" ]]; then
         if python3 -m venv "$venv_dir"; then
-            log "Created a python virtual environment for the backend."
+            debug "Created a python virtual environment for the backend."
         else
             fail "Couldn't create a python virtual environment for the backend."
             exit 1
@@ -28,7 +28,7 @@ setup_backend_venv() {
     dependencies="$(pip freeze)"
     installed="$(cat "$PROJECT_DIR"/backend/requirements.txt)"
     if [[ "$dependencies" != "$installed" ]]; then
-        log "Installing dependencies."
+        debug "Installing dependencies."
         pip install -r "$requirements_file" -qq
     fi
 }

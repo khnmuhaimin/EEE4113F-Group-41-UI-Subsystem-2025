@@ -36,10 +36,10 @@ main() {
     fi
 
     # Setting up environment variables
-    log "Exporting base environment variables..."
+    debug "Exporting base environment variables..."
     load_env_file "${PROJECT_DIR}"/.env
     load_environment_specific_file "$ENVIRONMENT"
-    log "Environment setup complete."
+    debug "Environment setup complete."
 
     case $1 in
         start)

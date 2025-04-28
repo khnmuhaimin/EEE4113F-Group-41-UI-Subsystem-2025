@@ -7,7 +7,7 @@
 load_env_file() {
     local env_file="$1"
     if [[ -f "$env_file" ]]; then
-        log "Loading environment variables from $env_file"
+        debug "Loading environment variables from $env_file"
         set -o allexport
         # shellcheck disable=SC1090
         source "$env_file"
