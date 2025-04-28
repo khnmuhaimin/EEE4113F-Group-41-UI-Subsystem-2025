@@ -60,7 +60,7 @@ start_server() {
     # if successful, print messages
     local start_command="gunicorn server.server:server --bind 0.0.0.0:$SERVER_PORT --access-logfile - --log-level $log_level"
     if start_process "$SERVER_PROCESS_TAG" "$start_command"; then
-        log "Started the server."
+        log "Starting the server."
         log "See $LOG_PATH for server logs."
         return 0
     else

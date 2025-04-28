@@ -42,7 +42,7 @@ start_cloudflared() {
 
     # if startup is successful, print messages
     if start_process "$CLOUDFLARED_PROCESS_TAG" "$start_command"; then
-        log "Started the Cloudflared tunnel."
+        log "Starting the Cloudflared tunnel."
         log "See $LOG_PATH for the Cloudflared tunnel logs."
         return 0
     else

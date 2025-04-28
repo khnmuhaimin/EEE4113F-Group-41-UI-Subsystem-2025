@@ -40,17 +40,14 @@ main() {
 
     case $1 in
         start)
-            "$PROJECT_DIR"/scripts.sh start-tunnel
-            "$PROJECT_DIR"/scripts.sh export-url
             "$PROJECT_DIR"/scripts.sh start-server
             "$PROJECT_DIR"/scripts.sh start-ui
-            "$PROJECT_DIR"/scripts.sh start-proxy
+            "$PROJECT_DIR"/scripts.sh start-tunnel
         ;;
         stop)
-            "$PROJECT_DIR"/scripts.sh stop-tunnel
             "$PROJECT_DIR"/scripts.sh stop-server
             "$PROJECT_DIR"/scripts.sh stop-ui
-            "$PROJECT_DIR"/scripts.sh stop-proxy
+            "$PROJECT_DIR"/scripts.sh stop-tunnel
         ;;
         start-server)
             setup_backend_venv

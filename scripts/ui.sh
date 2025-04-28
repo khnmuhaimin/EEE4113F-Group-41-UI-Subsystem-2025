@@ -41,7 +41,7 @@ start_ui_server() {
     start_command="$PROJECT_DIR/frontend/node_modules/.bin/vite serve $PROJECT_DIR/frontend --port $UI_PORT"
     # if startup is successful, print messages
     if start_process "$UI_PROCESS_TAG" "$start_command"; then
-        log "Started the UI server."
+        log "Starting the UI server."
         log "See $LOG_PATH for server logs."
         return 0
     else
