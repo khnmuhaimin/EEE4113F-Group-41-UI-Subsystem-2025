@@ -12,4 +12,5 @@ nginx.conf
 
 logs
 pids
-cloudflared
+cloudflared/*.json
+cloudflared/config.yml

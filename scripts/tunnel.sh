@@ -11,12 +11,14 @@ start_cloudflared() {
     fi
 
     # get paths to config and tunnel credentials
+    local config_template_path
     local config_path
     local tunnel_credentials_path
 
     config_path="$PROJECT_DIR"/cloudflared/config.yml
-    if [[ ! -f "$config_path" ]]; then
-        fail "Cloudflared tunnel configuration file not found at $config_path."
+    config_template_path="$PROJECT_DIR"/cloudflared/config.yml.template
+    if [[ ! -f "$config_template_path" ]]; then
+        fail "Cloudflared tunnel configuration template file not found at $config_template_path."
         exit 1
     fi
 
@@ -28,9 +30,15 @@ start_cloudflared() {
     fi
     tunnel_credentials_path="$(find "$PROJECT_DIR"/cloudflared -maxdepth 1 -type f -name "*.json")"
 
+    CLOUDFLARED_TUNNEL_CREDENTIALS_PATH="$tunnel_credentials_path"
+    export CLOUDFLARED_TUNNEL_CREDENTIALS_PATH
+    CLOUDFLARED_TUNNEL_ID="$(basename "$tunnel_credentials_path" .json)"
+    export CLOUDFLARED_TUNNEL_ID
+    envsubst < "$config_template_path" > "$PROJECT_DIR"/cloudflared/config.yml
+
     # generate start command
     local start_command
-    start_command="cloudflared tunnel --config $config_path --cred-file $tunnel_credentials_path run $CLOUDFLARED_TUNNEL_NAME"
+    start_command="cloudflared tunnel --config $config_path --cred-file $tunnel_credentials_path run $CLOUDFLARED_TUNNEL_ID"
 
     # if startup is successful, print messages
     if start_process "$CLOUDFLARED_PROCESS_TAG" "$start_command"; then

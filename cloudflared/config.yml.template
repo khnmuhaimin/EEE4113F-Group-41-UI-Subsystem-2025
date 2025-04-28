@@ -1,0 +1,10 @@
+tunnel: $CLOUDFLARED_TUNNEL_ID
+credentials-file: $CLOUDFLARED_TUNNEL_CREDENTIALS_PATH
+
+ingress:
+
+  - hostname: $DOMAIN
+    path: /api
+    service: http://localhost:$SERVER_PORT
+
+  - service: http://localhost:$UI_PORT
