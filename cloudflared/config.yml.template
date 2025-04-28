@@ -6,5 +6,5 @@ ingress:
   - hostname: $DOMAIN
     path: /api
     service: http://localhost:$SERVER_PORT
-
+  # catch all
   - service: http://localhost:$UI_PORT
