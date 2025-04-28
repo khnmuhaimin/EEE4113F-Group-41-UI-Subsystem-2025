@@ -4,14 +4,11 @@ from flask import Blueprint, jsonify, make_response, request
 from sqlalchemy import select
 from sqlalchemy.orm import Session as DatabaseSession
 
-from config.config import Config, Environment
 from routes.auth import authenticate_with_password, authenticate_with_session_id
 from database.database import DatabaseEngineProvider
 from database.models.admin import Admin
 from database.models.session import DEFAULT_SESSION_DURATION, Session as AdminSession
 from database.utils.utils import utc_timestamp
-from log.log import logger
-
 
 admin_blueprint = Blueprint("admin", __name__)
 
@@ -57,8 +54,8 @@ def login():
             str(admin_session.session_id),
             expires=admin_session.expires_at, 
             httponly=True,
-            secure=Config.ENVIRONMENT == Environment.DEMO,
-            samesite="None"
+            secure=True,
+            samesite="Lax"
         )
         return response
 
