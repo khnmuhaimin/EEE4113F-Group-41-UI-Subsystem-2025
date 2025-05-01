@@ -12,6 +12,7 @@ logger.info(f"The server is running in the {Config.ENVIRONMENT} environment.")
 
 DatabaseEngineProvider.load_default_database()
 DefaultDataProvider.load_default_admin(DatabaseEngineProvider.get_database_engine())
+DefaultDataProvider.load_default_nodes(DatabaseEngineProvider.get_database_engine())
 
 server = Flask(__name__)
 CORS(server, supports_credentials=True, origins=Config.BASE_URL)
