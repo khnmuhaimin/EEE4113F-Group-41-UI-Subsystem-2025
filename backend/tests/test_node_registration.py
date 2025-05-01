@@ -15,7 +15,7 @@ def test_successful_start_node_registration(client: FlaskClient, database_engine
 
     for ip_address in ip_addresses:
         response = client.post(
-            "/weighing-nodes/registration/start",
+            "/api/weighing-nodes/registration/start",
             environ_base={"REMOTE_ADDR": ip_address},
             headers={"Authorization": Config.PRESHARED_KEY}
         )
@@ -39,7 +39,7 @@ def test_unsuccessful_start_node_registration_due_missing_preshared_key(client: 
     ip_address = "192.168.34.101"
 
     response = client.post(
-        "/weighing-nodes/registration/start",
+        "/api/weighing-nodes/registration/start",
         environ_base={"REMOTE_ADDR": ip_address}
     )
 
@@ -51,7 +51,7 @@ def test_unsuccessful_start_node_registration_due_invalid_preshared_key(client: 
     ip_address = "192.168.34.101"
 
     response = client.post(
-        "/weighing-nodes/registration/start",
+        "/api/weighing-nodes/registration/start",
         environ_base={"REMOTE_ADDR": ip_address},
         headers={"Authorization": "Incorrect preshared key"}
     )
@@ -64,7 +64,7 @@ def test_unsuccessful_start_node_registration_due_to_invalid_ip_address(client: 
     ip_address = "an invalid ip address"
 
     response = client.post(
-        "/weighing-nodes/registration/start",
+        "/api/weighing-nodes/registration/start",
         environ_base={"REMOTE_ADDR": ip_address},
         headers={"Authorization": Config.PRESHARED_KEY}
     )
@@ -77,13 +77,13 @@ def test_unsuccessful_start_node_registration_due_ip_address_already_in_use(clie
     ip_address = "192.168.34.101"
 
     client.post(
-        "/weighing-nodes/registration/start",
+        "/api/weighing-nodes/registration/start",
         environ_base={"REMOTE_ADDR": ip_address},
         headers={"Authorization": Config.PRESHARED_KEY}
     )
 
     response = client.post(
-        "/weighing-nodes/registration/start",
+        "/api/weighing-nodes/registration/start",
         environ_base={"REMOTE_ADDR": ip_address},
         headers={"Authorization": Config.PRESHARED_KEY}
     )
@@ -94,7 +94,7 @@ def test_unsuccessful_start_node_registration_due_ip_address_already_in_use(clie
 
 def test_get_nodes_where_registration_is_in_progress(default_admin_client: FlaskClient, database_engine: Engine):
 
-    response = default_admin_client.get("/weighing-nodes/registration/in-progress")
+    response = default_admin_client.get("/api/weighing-nodes/registration/in-progress")
     assert response.status_code == 200
     assert response.json == []
 
@@ -102,7 +102,7 @@ def test_get_nodes_where_registration_is_in_progress(default_admin_client: Flask
 
     for ip_address in ip_addresses:
         default_admin_client.post(
-            "/weighing-nodes/registration/start",
+            "/api/weighing-nodes/registration/start",
             environ_base={"REMOTE_ADDR": ip_address},
             headers={"Authorization": Config.PRESHARED_KEY}
         )
@@ -112,7 +112,7 @@ def test_get_nodes_where_registration_is_in_progress(default_admin_client: Flask
         registered_node.registration_in_progress = False
         session.commit()
 
-    response = default_admin_client.get("/weighing-nodes/registration/in-progress")
+    response = default_admin_client.get("/api/weighing-nodes/registration/in-progress")
     
     assert response.status_code == 200
     assert len(response.json) == 2
@@ -122,16 +122,16 @@ def test_get_nodes_where_registration_is_in_progress(default_admin_client: Flask
 def test_successful_approval_of_weighing_node_registration(default_admin_client: FlaskClient, database_engine: Engine):
 
     default_admin_client.post(
-        "/weighing-nodes/registration/start",
+        "/api/weighing-nodes/registration/start",
         environ_base={"REMOTE_ADDR": "192.168.34.101"},
         headers={"Authorization":  Config.PRESHARED_KEY}
     )
 
-    response = default_admin_client.get("/weighing-nodes/registration/in-progress")
+    response = default_admin_client.get("/api/weighing-nodes/registration/in-progress")
     node_in_registration = response.json[0]
 
     response = default_admin_client.post(
-        "/weighing-nodes/registration/approve",
+        "/api/weighing-nodes/registration/approve",
         json={"weighing_node_id": node_in_registration["id"]}
     )
 
@@ -147,7 +147,7 @@ def test_successful_approval_of_weighing_node_registration(default_admin_client:
 def test_unsuccessful_approval_of_weighing_node_registration_due_to_missing_id(default_admin_client: FlaskClient, database_engine: Engine):
 
     response = default_admin_client.post(
-        "/weighing-nodes/registration/approve",
+        "/api/weighing-nodes/registration/approve",
         json={"wrong key": "wrong value"}
     )
 
@@ -158,7 +158,7 @@ def test_unsuccessful_approval_of_weighing_node_registration_due_to_missing_id(d
 @pytest.mark.parametrize("weighing_node_id", ["an invalid id", 19387, 348.3, None, ""])
 def test_unsuccessful_approval_of_weighing_node_registration_due_to_invalid_id(weighing_node_id, default_admin_client: FlaskClient, database_engine: Engine):
     response = default_admin_client.post(
-        "/weighing-nodes/registration/approve",
+        "/api/weighing-nodes/registration/approve",
         json={"weighing_node_id": weighing_node_id}
     )
     assert response.status_code == 422

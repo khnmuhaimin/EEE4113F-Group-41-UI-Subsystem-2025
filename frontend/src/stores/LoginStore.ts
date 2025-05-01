@@ -9,14 +9,19 @@ import { useUserStore } from "@/stores/UserStore"
 
 export const useLoginStore = defineStore("login", () => {
     const status = ref(LoginStatus.LOGGED_OUT)
+    const email = ref("")
+    const password = ref("")
+    const emailHelp = ref("")
+    const passwordHelp = ref("")
+    const loginMessage = ref("")
     const errorMessage = ref<string | null>(null)  // null means no error
     const emailError = ref<"" | "MISSING" | "INVALID" | "INCORRECT" | null>(null)
     const passwordError = ref<"" | "MISSING" | "INCORRECT" | null>(null)
 
-    const validateEmail = (email: string) => {
-        if (email === "") {
+    const validateEmail = () => {
+        if (email.value === "") {
             emailError.value = "MISSING"
-        } else if (!email.includes("@")) {
+        } else if (!email.value.includes("@")) {
             emailError.value = "INVALID"
         } else {
             emailError.value = null
@@ -24,8 +29,8 @@ export const useLoginStore = defineStore("login", () => {
         return emailError.value === null;
     }
 
-    const validatePassword = (password: string) => {
-        if (password === "") {
+    const validatePassword = () => {
+        if (password.value === "") {
             passwordError.value = "MISSING"
         } else {
             passwordError.value = null
@@ -46,13 +51,13 @@ export const useLoginStore = defineStore("login", () => {
      * @param email - The admin's email address.
      * @param password - The admin's password.
      */
-    const login = async (email: string, password: string) => {
+    const login = async () => {
         if (status.value == LoginStatus.LOGGING_IN || status.value == LoginStatus.LOGGING_OUT) {
             return  // do nothing to not complicate the logic
         }
 
-        validateEmail(email)
-        validatePassword(password)
+        validateEmail()
+        validatePassword()
         if (emailError.value !== null || passwordError.value !== null) {
             return
         }
@@ -61,13 +66,13 @@ export const useLoginStore = defineStore("login", () => {
         status.value = LoginStatus.LOGGING_IN
         errorMessage.value = null
         try {
-            const response = await loginAsAdmin(email, password)
+            const response = await loginAsAdmin(email.value, password.value)
             const response_body = await response.json()
             if (response.status == 200) {
                 // if login was successful
                 status.value = LoginStatus.LOGGED_IN
                 const userStore = useUserStore()
-                userStore.setAdminDetails(response_body["name"], email)
+                userStore.setAdminDetails(response_body["name"], email.value)
             } else if (response.status == 401){
                 // if login failed due to a known reason
                 status.value = previousStatus
@@ -129,5 +134,16 @@ export const useLoginStore = defineStore("login", () => {
         return status.value === LoginStatus.LOGGING_IN || status.value === LoginStatus.LOGGING_OUT
     }
 
-    return { status, errorMessage, emailError, passwordError, login, logout, errorOccured, inProgress }
+    const $reset = () => {
+        email.value = ""
+        password.value = ""
+        emailHelp.value = ""
+        passwordHelp.value = ""
+        loginMessage.value = ""
+        errorMessage.value = null
+        emailError.value = null
+        passwordError .value = null
+    }
+
+    return { status, email, password, emailHelp, passwordHelp, loginMessage, errorMessage, emailError, passwordError, login, logout, errorOccured, inProgress, $reset }
 })

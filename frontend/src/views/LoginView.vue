@@ -1,40 +1,34 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
 import { useLoginStore } from "@/stores/LoginStore"
 import { LoginStatus } from "@/enums/LoginStatus"
 import router from "@/router"
 
-const email = ref("")
-const password = ref("")
-const emailHelp = ref("")
-const passwordHelp = ref("")
-const loginMessage = ref("")
 const loginStore = useLoginStore()
-
 
 const handleAdminLogin = async () => {
 
-  await loginStore.login(email.value, password.value)
+  await loginStore.login()
   if (loginStore.status === LoginStatus.LOGGED_IN) {
     router.push("/dashboard")
   }
 
   if (loginStore.emailError === "MISSING") {
-    emailHelp.value = "Enter the email address."
+    loginStore.emailHelp = "Enter the email address."
   } else if (loginStore.emailError === "INVALID") {
-    emailHelp.value = "The email address is not valid."
+    loginStore.emailHelp = "The email address is not valid."
   } else if (loginStore.emailError === "INCORRECT" || loginStore.emailError === null) {
-    emailHelp.value = ""
+    loginStore.emailHelp = ""
   }
 
   if (loginStore.passwordError === "MISSING") {
-    passwordHelp.value = "Enter the password."
+    loginStore.passwordHelp = "Enter the password."
   } else if (loginStore.passwordError === "INCORRECT" || loginStore.passwordError === null) {
-    passwordHelp.value = ""
+    loginStore.passwordHelp = ""
   }
 
   if (loginStore.emailError === "INCORRECT" || loginStore.passwordError === "INCORRECT") {
-    loginMessage.value = "Are you sure your login details are correct?"
+    loginStore.loginMessage = "Are you sure your login details are correct?"
   }
 }
 
@@ -42,6 +36,10 @@ const handleGuestLogin = async() => {
   await loginStore.logout()
   router.push("/dashboard")
 }
+
+onMounted(() => {
+  loginStore.$reset()
+})
 </script>
 
 <template>
@@ -53,19 +51,19 @@ const handleGuestLogin = async() => {
     <div id="form-container" class="vertical-stack center-children my-3">
       <div id="email-container" class="vertical-stack center-children horizontal-fill my-3">
         <label id="email-label" for="email" class="form-label">Email:</label>
-        <input id="email" v-model="email" type="text" class="form-control" :class="{ 'is-invalid': loginStore.emailError !== null }"/>
-        <div id="email-help" class="form-text">{{ emailHelp }}</div>
+        <input id="email" v-model="loginStore.email" type="text" class="form-control" :class="{ 'is-invalid': loginStore.emailError !== null }"/>
+        <div id="email-help" class="form-text">{{ loginStore.emailHelp }}</div>
       </div>
       <div id="password-container" class="vertical-stack center-children horizontal-fill my-3">
         <label id="password-label" for="password" class="form-label">Password:</label>
-        <input id="password" v-model="password" type="password" class="form-control" :class="{ 'is-invalid': loginStore.passwordError !== null }"/>
-        <div id="password-help" class="form-text">{{ passwordHelp }}</div>
+        <input id="password" v-model="loginStore.password" type="password" class="form-control" :class="{ 'is-invalid': loginStore.passwordError !== null }"/>
+        <div id="password-help" class="form-text">{{ loginStore.passwordHelp }}</div>
       </div>
       <div class="vertical-stack horizontal-fill center-children my-3">
         <button id="admin-login-button" class="btn my-2" @click="handleAdminLogin" :disabled="loginStore.inProgress()">Login as Admin</button>
         <button id="guest-login-button" class="btn my-2" @click="handleGuestLogin" :disabled="loginStore.inProgress()">Continue As Guest</button>
       </div>
-      <div id="login-message">{{ loginMessage }}</div>
+      <div id="login-message">{{ loginStore.loginMessage }}</div>
     </div>
   </div>
 </template>

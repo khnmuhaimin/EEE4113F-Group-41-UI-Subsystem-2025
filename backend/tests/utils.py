@@ -53,7 +53,7 @@ def login_default_admin(client: FlaskClient) -> None:
     admin_email = Config.ADMIN_EMAIL
     admin_password = Config.ADMIN_PASSWORD
 
-    client.post("/admins/login", json={
+    client.post("/api/admins/login", json={
         "email": admin_email,
         "password": admin_password
     })

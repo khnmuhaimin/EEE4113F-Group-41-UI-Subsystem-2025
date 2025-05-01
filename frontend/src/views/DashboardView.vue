@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import NavBar from "@/components/NavBar.vue";
 import { UserType } from "@/enums/UserType";
 import router from "@/router";
 import { useLoginStore } from "@/stores/LoginStore";
@@ -18,6 +19,7 @@ const userStore = useUserStore()
 </script>
 
 <template>
+    <NavBar/>
     <div>Hello world</div>
     <div v-if="userStore.type === UserType.ADMIN">
         <p>You are an admin. Your name is {{ userStore.name }}. Your email address is {{ userStore.email }}.</p>

@@ -171,9 +171,8 @@ def get_registration_tasks():
     - 401 if session is invalid or expired.
     """
     with Session(DatabaseEngineProvider.get_database_engine()) as session:
-        nodes_in_registration = session.scalars(select(WeighingNode).where(WeighingNode.registration_in_progress == True)).all()
+        nodes_in_registration = session.scalars(select(WeighingNode).where(WeighingNode.registration_in_progress == True).order_by(WeighingNode.created_at)).all()
         nodes_in_registration = list(map(lambda t: t.registration_in_progress_view(), nodes_in_registration))
-        nodes_in_registration.sort(key=lambda t: t["created_at"])
         response = jsonify(nodes_in_registration)
         response.status_code = HTTPStatus.OK
         return response
@@ -217,3 +216,14 @@ def approve_weighing_node_registration():
         session.commit()
         return ("", HTTPStatus.NO_CONTENT)
     
+
+
+@weighing_node_blueprint.route("", endpoint="get_weighing_nodes")
+@authenticate_with_session_id
+def get_weighing_nodes():
+    with Session(DatabaseEngineProvider.get_database_engine()) as session:
+        weighing_nodes = session.scalars(select(WeighingNode).order_by(WeighingNode.created_at)).all()
+        weighing_nodes = list(map(lambda t: t.admin_view(), weighing_nodes))
+        response = jsonify(weighing_nodes)
+        response.status_code = HTTPStatus.OK
+        return response

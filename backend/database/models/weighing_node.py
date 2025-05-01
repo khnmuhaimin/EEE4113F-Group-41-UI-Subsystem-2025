@@ -28,3 +28,12 @@ class WeighingNode(Base):
         result["leds_flashing"] = self.leds_flashing
         result["created_at"] = datetime.fromtimestamp(self.created_at, tz=timezone.utc)
         return result
+    
+    def admin_view(self):
+        result = {}
+        result["id"] = self.uuid
+        result["location"] = self.location
+        result["registration_in_progress"] = self.registration_in_progress
+        result["leds_flashing"] = self.leds_flashing
+        result["created_at"] = datetime.fromtimestamp(self.created_at, tz=timezone.utc)
+        return result
