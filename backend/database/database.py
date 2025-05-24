@@ -63,7 +63,7 @@ class DefaultDataProvider:
                 "location": None,
                 "registration_in_progress": True,
                 "api_key": generate_secret(),
-                "leds_flashing": True,
+                "leds_flashing": False,
                 "created_at": utc_timestamp(86400 * 7),  # one week ago
             },
             {
