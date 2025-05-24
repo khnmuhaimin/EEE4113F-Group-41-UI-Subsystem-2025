@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from http import HTTPStatus
 from uuid import UUID
 from flask import Blueprint, jsonify, request
@@ -55,31 +56,6 @@ enforce_registration_in_progress = enforce_registration_in_progress_value(in_pro
 enforce_registration_complete = enforce_registration_in_progress_value(in_progress=False)
 
 
-@weighing_node_blueprint.route("/ip-address", methods=["PUT"], endpoint="update_ip_address")
-@authenticate_weighing_node
-@enforce_registration_in_progress
-def update_ip_address():
-    """
-    @update_ip_address
-
-    Route to update the IP address of a weighing node.
-
-    Returns:
-    - 400 (Unprocessable Entity) if the IP address is missing.
-    - 404 (Not Found) if the node with the specified "Node-ID" is not found.
-    - 204 (No Content) on successful update, with no response body.
-    """
-    ip_address = request.remote_addr
-    if ip_address is None:
-        return ("IP Address not found", HTTPStatus.BAD_REQUEST)
-    with Session(DatabaseEngineProvider.get_database_engine()) as session:
-        node_id = request.headers.get("Node-ID")
-        node = session.scalar(select(WeighingNode.uuid == node_id))
-        node.ip_address = ip_address
-        session.commit()
-    return ("", HTTPStatus.NO_CONTENT)
-
-
 @weighing_node_blueprint.route("/flash-leds", methods=["PUT"], endpoint="make_node_flash_leds")
 @authenticate_with_session_id
 def make_node_flash_leds():
@@ -120,7 +96,6 @@ def start_registration():
     Returned Values:
     - 200 OK: Returns the newly created node's UUID and API key.
     - 401 Unauthorized: If the Authorization header is missing or the key is invalid.
-    - 400 Bad Request: If the IP address is missing or invalid.
 
     """
     # authenticate node using the preshared key
@@ -132,19 +107,10 @@ def start_registration():
     if not correct_key:
         return ("Invalid key.", HTTPStatus.UNAUTHORIZED)
     
-    # confirm presence of IP address
-    ip_address = request.remote_addr
-    if ip_address is None:
-        return ("IP Address not found.", HTTPStatus.BAD_REQUEST)
-    if not is_ip_address(ip_address):
-        return ("IP Address is invalid.", HTTPStatus.UNPROCESSABLE_ENTITY)
-    
     # create the new node
     try:
         with Session(DatabaseEngineProvider.get_database_engine()) as session:
-            node = WeighingNode(
-                ip_address=ip_address,
-            )
+            node = WeighingNode()
             node.api_key = generate_secret()
             node.hashed_api_key = hash_secret(node.api_key)
             session.add(node)
@@ -155,6 +121,20 @@ def start_registration():
         error_message = str(e.orig)
         if error_message == "UNIQUE constraint failed: weighing_nodes.ip_address":
             return ("The IP address is already in use.", HTTPStatus.CONFLICT)
+        
+
+@weighing_node_blueprint.route("/<node_id>", endpoint="get_weighing_node")
+@authenticate_weighing_node
+def get_weighing_node(node_id):
+    with Session(DatabaseEngineProvider.get_database_engine()) as session:
+        node = session.scalars(select(WeighingNode).where(WeighingNode.uuid == node_id).order_by(WeighingNode.created_at)).one_or_none()
+        # guaranteed to not be None
+        response = f"""{str(node.uuid)}
+{"null" if node.location is None else node.location }
+{str(node.registration_in_progress).lower()}
+{str(node.leds_flashing).lower()}
+{datetime.fromtimestamp(node.created_at, tz=timezone.utc).isoformat()}"""
+        return response, HTTPStatus.OK
 
 
 @weighing_node_blueprint.route("/registration/in-progress", endpoint="get_registration_tasks")

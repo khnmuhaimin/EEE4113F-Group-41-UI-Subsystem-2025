@@ -53,7 +53,6 @@ class DefaultDataProvider:
     def load_default_nodes(cls, engine: Engine):
         mock_nodes = [
             {
-                "ip_address": "192.168.0.2",
                 "location": "Warehouse A",
                 "registration_in_progress": False,
                 "api_key": generate_secret(),
@@ -61,7 +60,6 @@ class DefaultDataProvider:
                 "created_at": utc_timestamp(86400)  # one day ago
             },
             {
-                "ip_address": "192.168.0.3",
                 "location": None,
                 "registration_in_progress": True,
                 "api_key": generate_secret(),
@@ -69,7 +67,6 @@ class DefaultDataProvider:
                 "created_at": utc_timestamp(86400 * 7),  # one week ago
             },
             {
-                "ip_address": "fe80::1",
                 "location": "Dock 3",
                 "registration_in_progress": False,
                 "api_key": generate_secret(),

@@ -13,7 +13,6 @@ class WeighingNode(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     uuid: Mapped[UUID] = mapped_column(default=uuid4, unique=True)
-    ip_address: Mapped[str] = mapped_column(String(39), unique=True)  # to enable two-way communication during registration. can be null afterwards.
     location: Mapped[str | None] = mapped_column(String(50), default=None)  # null during registration
     registration_in_progress: Mapped[bool] = mapped_column(default=True)
     leds_flashing: Mapped[bool] = mapped_column(default=False)
