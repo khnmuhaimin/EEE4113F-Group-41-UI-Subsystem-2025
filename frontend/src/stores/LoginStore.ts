@@ -68,8 +68,10 @@ export const useLoginStore = defineStore("login", () => {
         try {
             const response = await loginAsAdmin(email.value, password.value)
             const response_body = await response.json()
+            console.log(response_body)
             if (response.status == 200) {
                 // if login was successful
+                console.log("Logged in successfully.")
                 status.value = LoginStatus.LOGGED_IN
                 const userStore = useUserStore()
                 userStore.setAdminDetails(response_body["name"], email.value)

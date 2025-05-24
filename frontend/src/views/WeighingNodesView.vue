@@ -3,24 +3,40 @@ import BigMessage from "@/components/BigMessage.vue";
 import NavBar from "@/components/NavBar.vue";
 import { UserType } from "@/enums/UserType";
 import router from "@/router";
+import { useLoginStore } from "@/stores/LoginStore";
 import { useUserStore } from "@/stores/UserStore";
 import { useWeighingNodesStore } from "@/stores/WeighingNodesStore";
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 
 const userStore = useUserStore()
 const weighingNodesStore = useWeighingNodesStore()
+const loginStore = useLoginStore()
+const bigMessage = ref("")
 
-// onMounted(() => {
-//   if (userStore.type === UserType.GUEST) {
-//     router.push("/login")
-//   }
-// })
+onMounted( async () => {
+    // if (userStore.type === UserType.GUEST) {
+    //     router.push("/login")
+    // }
+    bigMessage.value = "Loading..."
+    loginStore.email = "admin@org.com"
+    loginStore.password = "admin"
+    await loginStore.login()
+    weighingNodesStore.fetch()
+    if (userStore.type === UserType.GUEST) {
+        bigMessage.value = "You need to be logged in to view this resource."
+    } else if (weighingNodesStore.size() === 0) {
+        bigMessage.value = "You don't have any weighing nodes pending registration of deployed."
+    } else {
+        bigMessage.value = ""
+    }
+    console.log("Big message: " + bigMessage.value)
+})
 </script>
 
 <template>
     <div class="minsize-fullscreen vertical-stack">
         <NavBar/>
-        <BigMessage v-if="weighingNodesStore.size() === 0" message="You have no weighing nodes yet." style="flex: 1"/>
+        <BigMessage v-if="weighingNodesStore.size() === 0" :message="bigMessage" style="flex: 1"/>
         <div class="card mb-3" v-for="node in weighingNodesStore.weighingNodes" :key="node.id">
         <div class="card-body">
             <h5 class="card-title">Location: {{ node.location || 'Unknown' }}</h5>

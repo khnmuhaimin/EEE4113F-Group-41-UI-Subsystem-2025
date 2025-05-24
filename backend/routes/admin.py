@@ -34,9 +34,8 @@ def login():
 
         if session_exists:
             # update existing session
-            now = utc_timestamp()
             admin_session.assign_new_session_id()
-            admin_session.expires_at = now + DEFAULT_SESSION_DURATION
+            admin_session.expires_at = utc_timestamp(offset=DEFAULT_SESSION_DURATION)
         
         else:  
             # Create and return new session

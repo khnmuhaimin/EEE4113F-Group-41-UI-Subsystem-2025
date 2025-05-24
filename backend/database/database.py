@@ -1,4 +1,7 @@
-from sqlalchemy import Engine, create_engine
+import random
+from uuid import uuid4
+import numpy as np
+from sqlalchemy import Engine, create_engine, select
 from sqlalchemy.orm import Session
 
 from auth.auth import generate_secret, hash_password, hash_secret
@@ -78,5 +81,30 @@ class DefaultDataProvider:
             for node in mock_nodes:
                 session.add(
                     WeighingNode(**node)
+                )
+            session.commit()
+
+    @classmethod
+    def load_default_weight_readings(cls, engine: Engine):
+        NUM_READINGS = 50
+        NUM_PENGUINS = 10
+        penguin_rfids = [uuid4() for _ in range(NUM_PENGUINS)]
+        node_ids = []
+        with Session(engine) as session:
+            node_ids = [node.id for node in session.scalars(select(WeighingNode)).all()]
+        readings = []
+        for _ in range(NUM_READINGS):
+            reading = {
+                "node_id": random.choice(node_ids),
+                "penguin_rfid": random.choice(penguin_rfids),
+                "towards_ocean": random.choice([True, False]),
+                "weight": round(np.random.normal(loc=3100, scale=500), 2),
+                "created_at": utc_timestamp(offset=random.randint(-1_000_000, 0))
+            }
+            readings.append(reading)
+        with Session(engine) as session:
+            for reading in readings:
+                session.add(
+                    WeighingNode(**reading)
                 )
             session.commit()

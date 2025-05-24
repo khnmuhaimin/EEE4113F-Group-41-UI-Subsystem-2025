@@ -9,9 +9,6 @@ import { API_BASE_URL } from "@/endpoints/utils";
  * @returns {Promise<Response>} The response object from the server.
  */
 export const loginAsAdmin = async (email: string, password: string): Promise<Response> => {
-
-    console.log(API_BASE_URL)
-
     const response = await fetch(`${API_BASE_URL}/admins/login`, {
         method: "POST",
         headers: {

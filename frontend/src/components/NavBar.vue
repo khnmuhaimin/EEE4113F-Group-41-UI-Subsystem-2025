@@ -20,6 +20,20 @@ const viewWeighingNodes = () => {
     router.push("/weighing-nodes")
     return;
 }
+
+const viewWeighingNodesActive = () => {
+    console.log(router.currentRoute.value.path)
+    return router.currentRoute.value.path === "/weighing-nodes"
+}
+
+const viewDashboard = () => {
+    router.push("/dashboard")
+    return
+}
+
+const dashboardActive = () => {
+    return router.currentRoute.value.path === "/dashboard"
+}
 </script>
 
 <template>
@@ -33,14 +47,17 @@ const viewWeighingNodes = () => {
             </button>
             <div class="collapse navbar-collapse" id="menu-container">
                 <ul id="menu-options" class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    <li v-if="userStore.type === UserType.ADMIN" class="nav-item">
-                        <a class="nav-link" href="#" :onclick="viewWeighingNodes">Weighing Nodes</a>
-                    </li>
                     <li class="nav-item">
-                        <a v-if="userStore.type === UserType.GUEST" class="nav-link" href="#" :onclick="login">Login</a>
+                        <button class="nav-link btn" :onclick="viewDashboard" :disabled="dashboardActive()">Dashboard</button>
                     </li>
                     <li v-if="userStore.type === UserType.ADMIN" class="nav-item">
-                        <a class="nav-link" href="#" :onclick="logout">Logout</a>
+                        <button v-if="userStore.type === UserType.ADMIN" class="nav-link btn" :onclick="viewWeighingNodes" :disabled="viewWeighingNodesActive()">Weighing Nodes</button>
+                    </li>
+                    <li v-if="userStore.type === UserType.GUEST" class="nav-item">
+                        <button class="nav-link btn" :onclick="login">Login</button>
+                    </li>
+                    <li v-if="userStore.type === UserType.ADMIN" class="nav-item">
+                        <button class="nav-link btn" :onclick="logout">Logout</button>
                     </li>
                 </ul>
             </div>
