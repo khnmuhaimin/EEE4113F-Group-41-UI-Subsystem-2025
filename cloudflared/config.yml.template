@@ -6,5 +6,8 @@ ingress:
   - hostname: $DOMAIN
     path: /api
     service: http://localhost:$SERVER_PORT
+  - hostname: eee4113f-group-41.online
+    path: /ws
+    service: ws://localhost:8002
   # catch all
   - service: http://localhost:$UI_PORT

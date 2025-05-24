@@ -3,6 +3,7 @@ from uuid import uuid4
 import numpy as np
 from sqlalchemy import Engine, create_engine, select
 from sqlalchemy.orm import Session
+from log.log import logger
 
 from auth.auth import generate_secret, hash_password, hash_secret
 from database.utils.utils import utc_timestamp
@@ -108,3 +109,5 @@ class DefaultDataProvider:
                     WeightReading(**reading)
                 )
             session.commit()
+        with Session(engine) as session:
+            readings = session.scalars(select(WeightReading).order_by(WeightReading.created_at)).all()
