@@ -123,9 +123,10 @@ def start_registration():
             return ("The IP address is already in use.", HTTPStatus.CONFLICT)
         
 
-@weighing_node_blueprint.route("/<node_id>", endpoint="get_weighing_node")
+@weighing_node_blueprint.route("", endpoint="get_weighing_node")
 @authenticate_weighing_node
-def get_weighing_node(node_id):
+def get_weighing_node():
+    node_id = request.headers.get("Node-ID")
     with Session(DatabaseEngineProvider.get_database_engine()) as session:
         node = session.scalars(select(WeighingNode).where(WeighingNode.uuid == node_id).order_by(WeighingNode.created_at)).one_or_none()
         # guaranteed to not be None
