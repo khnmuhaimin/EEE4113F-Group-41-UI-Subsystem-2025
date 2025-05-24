@@ -1,9 +1,19 @@
 <script setup lang="ts">
+import DashboardCard from "@/components/DashboardCard.vue";
+import WeightScatterChart from "@/components/WeightScatterChart.vue";
 import NavBar from "@/components/NavBar.vue";
 import { UserType } from "@/enums/UserType";
 import router from "@/router";
 import { useLoginStore } from "@/stores/LoginStore";
 import { useUserStore } from "@/stores/UserStore";
+import { useWeightReadingsStore } from "@/stores/WeightReadingsStore";
+import { onMounted } from "vue";
+import { useWeighingNodesStore } from "@/stores/WeighingNodesStore";
+
+
+const userStore = useUserStore()
+const weightReadingsStore = useWeightReadingsStore();
+const weighingNodesStore = useWeighingNodesStore();
 
 const handleLogin = () => {
     router.push("/login")
@@ -15,7 +25,11 @@ const handleLogout = () => {
     router.push("/login")
 }
 
-const userStore = useUserStore()
+onMounted(async () => {
+    await weightReadingsStore.fetch();
+    await weighingNodesStore.fetch();
+});
+
 </script>
 
 <template>
@@ -30,4 +44,18 @@ const userStore = useUserStore()
         <button @click="handleLogin">Login</button>
     </div>
     <div>This is the dashboard.</div>
+    <div>
+        <DashboardCard>
+            <h5>Total Readings</h5>
+            <p>{{ weightReadingsStore.numReadings() }}</p>
+        </DashboardCard>
+        <DashboardCard>
+            <h5>Weight Readings</h5>
+            <WeightScatterChart :readings="weightReadingsStore.weightReadings" />
+        </DashboardCard>
+        <DashboardCard>
+            <h5>Total Weighing Nodes</h5>
+            <p>{{ weighingNodesStore.numNodes() }}</p>
+        </DashboardCard>
+    </div>
 </template>

@@ -20,7 +20,7 @@ export const useWeighingNodesStore = defineStore("weighingNodes", () => {
         }   
     }
 
-    const size = () => weighingNodes.value.length
+    const numNodes = () => weighingNodes.value.length
 
-    return { fetchStatus, weighingNodes, fetch, size }
+    return { fetchStatus, weighingNodes, fetch, numNodes }
 })

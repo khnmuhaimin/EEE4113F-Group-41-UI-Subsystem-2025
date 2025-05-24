@@ -24,7 +24,7 @@ onMounted( async () => {
     weighingNodesStore.fetch()
     if (userStore.type === UserType.GUEST) {
         bigMessage.value = "You need to be logged in to view this resource."
-    } else if (weighingNodesStore.size() === 0) {
+    } else if (weighingNodesStore.numNodes() === 0) {
         bigMessage.value = "You don't have any weighing nodes pending registration of deployed."
     } else {
         bigMessage.value = ""
@@ -36,7 +36,7 @@ onMounted( async () => {
 <template>
     <div class="minsize-fullscreen vertical-stack">
         <NavBar/>
-        <BigMessage v-if="weighingNodesStore.size() === 0" :message="bigMessage" style="flex: 1"/>
+        <BigMessage v-if="weighingNodesStore.numNodes() === 0" :message="bigMessage" style="flex: 1"/>
         <div class="card mb-3" v-for="node in weighingNodesStore.weighingNodes" :key="node.id">
         <div class="card-body">
             <h5 class="card-title">Location: {{ node.location || 'Unknown' }}</h5>

@@ -10,6 +10,7 @@ from config.config import Config
 from database.models.base import Base
 from database.models import admin, session, weighing_node, weight_reading  # import all tables so they can be created
 from database.models.weighing_node import WeighingNode
+from database.models.weight_reading import WeightReading
 
 
 class DatabaseEngineProvider:
@@ -88,7 +89,7 @@ class DefaultDataProvider:
     def load_default_weight_readings(cls, engine: Engine):
         NUM_READINGS = 50
         NUM_PENGUINS = 10
-        penguin_rfids = [uuid4() for _ in range(NUM_PENGUINS)]
+        penguin_rfids = [str(uuid4()) for _ in range(NUM_PENGUINS)]
         node_ids = []
         with Session(engine) as session:
             node_ids = [node.id for node in session.scalars(select(WeighingNode)).all()]
@@ -97,7 +98,6 @@ class DefaultDataProvider:
             reading = {
                 "node_id": random.choice(node_ids),
                 "penguin_rfid": random.choice(penguin_rfids),
-                "towards_ocean": random.choice([True, False]),
                 "weight": round(np.random.normal(loc=3100, scale=500), 2),
                 "created_at": utc_timestamp(offset=random.randint(-1_000_000, 0))
             }
@@ -105,6 +105,6 @@ class DefaultDataProvider:
         with Session(engine) as session:
             for reading in readings:
                 session.add(
-                    WeighingNode(**reading)
+                    WeightReading(**reading)
                 )
             session.commit()
