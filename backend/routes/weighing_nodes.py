@@ -91,22 +91,12 @@ def start_registration():
     @start_registration
 
     Description:
-    Initiates the registration process for a new weighing node. Authenticates with a preshared key, validates the IP address, and creates a new weighing node in the database.
+    Initiates the registration process for a new weighing node.
 
     Returned Values:
     - 200 OK: Returns the newly created node's UUID and API key.
-    - 401 Unauthorized: If the Authorization header is missing or the key is invalid.
 
-    """
-    # authenticate node using the preshared key
-    # different from the standard auth protocol for weighing nodes
-    auth_header = request.headers.get("Authorization")
-    if auth_header is None:
-        return ("Authorization header is missing.", HTTPStatus.UNAUTHORIZED)
-    correct_key = verify_preshared_key(auth_header)
-    if not correct_key:
-        return ("Invalid key.", HTTPStatus.UNAUTHORIZED)
-    
+    """    
     # create the new node
     try:
         with Session(DatabaseEngineProvider.get_database_engine()) as session:

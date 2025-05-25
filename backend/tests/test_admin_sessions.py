@@ -2,14 +2,13 @@ from flask.testing import FlaskClient
 from sqlalchemy import Engine
 
 from config.config import Config
-from tests.utils import client, database_engine, insert_default_admin, default_admin_client
+from tests.utils import client, database_engine, default_admin_client
 
 
 def test_successful_admin_login(client: FlaskClient, database_engine: Engine):
     """
     Verifies that login with correct admin credentials returns 200 and sets the session_id cookie.
     """
-    insert_default_admin(database_engine)
     admin_name = Config.ADMIN_NAME
     admin_email = Config.ADMIN_EMAIL
     admin_password = Config.ADMIN_PASSWORD
@@ -52,7 +51,6 @@ def test_admin_login_failed_due_to_invalid_credentials(client: FlaskClient, data
     """
     Ensures that login attempts with incorrect email/password return 401 and no session cookie.
     """
-    insert_default_admin(database_engine)
     admin_email = Config.ADMIN_EMAIL
     admin_password = Config.ADMIN_PASSWORD
     
