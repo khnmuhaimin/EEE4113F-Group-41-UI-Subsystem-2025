@@ -55,6 +55,13 @@ onMounted( async () => {
             <p class="card-text">
             Created at: {{ new Date(node.created_at).toLocaleDateString() }}
             </p>
+            <button v-if="node.registration_in_progress" class="btn btn-primary mt-2">
+                Approve Registration
+            </button>
+            <p v-if="node.registration_in_progress">Flash the LEDs to see which node is waiting to be registered. When you click the button, wait a few seconds. The node might take a few seconds to starts flashing its LEDs.</p>
+            <button v-if="node.registration_in_progress" class="btn btn-primary mt-2">
+                Flash LEDs
+            </button>
         </div>
         </div>
     </div>

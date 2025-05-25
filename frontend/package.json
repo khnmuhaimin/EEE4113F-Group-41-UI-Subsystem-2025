@@ -15,6 +15,7 @@
     "bootstrap": "^5.3.5",
     "chart.js": "^4.4.9",
     "chartjs-adapter-date-fns": "^3.0.0",
+    "chartjs-plugin-trendline": "^2.1.9",
     "pinia": "^3.0.1",
     "socket.io-client": "^4.8.1",
     "vue": "^3.5.13",

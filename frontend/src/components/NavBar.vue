@@ -47,6 +47,9 @@ const dashboardActive = () => {
             </button>
             <div class="collapse navbar-collapse" id="menu-container">
                 <ul id="menu-options" class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li v-if="userStore.type === UserType.ADMIN" class="nav-item">
+                        <button v-if="userStore.type === UserType.ADMIN" class="nav-link btn">Download Data</button>
+                    </li>
                     <li class="nav-item">
                         <button class="nav-link btn" :onclick="viewDashboard" :disabled="dashboardActive()">Dashboard</button>
                     </li>

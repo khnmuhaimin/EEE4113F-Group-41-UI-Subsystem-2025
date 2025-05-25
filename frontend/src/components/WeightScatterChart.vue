@@ -7,6 +7,7 @@
     import Chart from "chart.js/auto";
     import "chartjs-adapter-date-fns";
     import type { WeightReading } from "@/types/WeightReading";
+    import 'chartjs-plugin-trendline';
 
     const props = defineProps<{
         readings: WeightReading[];
@@ -34,8 +35,8 @@
                     {
                         label: "Penguin Weight over Time",
                         data: dataPoints,
-                        backgroundColor: "rgba(54, 162, 235, 0.7)",
-                    },
+                        backgroundColor: "rgba(54, 162, 235, 0.7)"
+                    }
                 ],
             },
             options: {
@@ -54,7 +55,7 @@
                     y: {
                         title: {
                             display: true,
-                            text: "Weight (kg)",
+                            text: "Weight (g)",
                         },
                         beginAtZero: true,
                     },
@@ -65,7 +66,7 @@
 
     onMounted(() => {
         console.log("creating chart")
-    createChart();
+    // createChart();
     });
 
     watch(
@@ -79,6 +80,6 @@
 <style scoped>
 canvas {
   width: 100%;
-  height: 400px;
+  max-height: 300px;
 }
 </style>

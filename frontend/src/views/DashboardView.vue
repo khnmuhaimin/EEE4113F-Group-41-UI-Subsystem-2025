@@ -33,29 +33,68 @@ onMounted(async () => {
 </script>
 
 <template>
-    <NavBar/>
-    <div>Hello world</div>
-    <div v-if="userStore.type === UserType.ADMIN">
-        <p>You are an admin. Your name is {{ userStore.name }}. Your email address is {{ userStore.email }}.</p>
-        <button @click="handleLogout">Logout</button>
+  <NavBar />
+  <div class="dashboard-container">
+    <div class="summary-cards">
+      <DashboardCard>
+        <h5>Weights Collected</h5>
+        <p>Number of weight recordings collected.</p>
+        <p>{{ weightReadingsStore.numReadings() }}</p>
+      </DashboardCard>
+      <DashboardCard>
+        <h5>Total Weighing Nodes</h5>
+        <p>Weighing nodes registered</p>
+        <p>{{ weighingNodesStore.numNodes() }}</p>
+      </DashboardCard>
+      <DashboardCard>
+        <h5>Weighing Nodes Online</h5>
+        <p>Weighing nodes registered and alive.</p>
+        <p>{{ weighingNodesStore.numNodes() }}</p>
+      </DashboardCard>
     </div>
-    <div v-if="userStore.type === UserType.GUEST">
-        <p>You are a guest. We don't know your name or email address.</p>
-        <button @click="handleLogin">Login</button>
+
+    <div class="chart-card">
+      <DashboardCard>
+        <h5>Weight Readings</h5>
+        <WeightScatterChart :readings="weightReadingsStore.weightReadings" />
+      </DashboardCard>
     </div>
-    <div>This is the dashboard.</div>
-    <div>
-        <DashboardCard>
-            <h5>Total Readings</h5>
-            <p>{{ weightReadingsStore.numReadings() }}</p>
-        </DashboardCard>
-        <DashboardCard>
-            <h5>Weight Readings</h5>
-            <WeightScatterChart :readings="weightReadingsStore.weightReadings" />
-        </DashboardCard>
-        <DashboardCard>
-            <h5>Total Weighing Nodes</h5>
-            <p>{{ weighingNodesStore.numNodes() }}</p>
-        </DashboardCard>
-    </div>
+  </div>
 </template>
+
+<style scoped>
+.dashboard-container {
+  margin: 0 auto;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.summary-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem; /* adds space above the summary cards */
+}
+
+.chart-card {
+  margin-top: 0.5rem;
+}
+
+.download-button {
+  align-self: flex-start;
+  margin-top: 0.5rem;
+  margin-bottom: 2rem; /* adds space below the button */
+}
+
+@media (min-width: 768px) {
+  .dashboard-container {
+    width: 75%;
+  }
+
+  .summary-cards {
+    flex-direction: row;
+  }
+}
+</style>

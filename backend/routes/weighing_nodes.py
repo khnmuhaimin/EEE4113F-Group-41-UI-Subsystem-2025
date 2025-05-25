@@ -199,7 +199,7 @@ def approve_weighing_node_registration():
     
 
 
-@weighing_node_blueprint.route("", endpoint="get_weighing_nodes")
+@weighing_node_blueprint.route("all", endpoint="get_weighing_nodes")
 @authenticate_with_session_id
 def get_weighing_nodes():
     with Session(DatabaseEngineProvider.get_database_engine()) as session:
