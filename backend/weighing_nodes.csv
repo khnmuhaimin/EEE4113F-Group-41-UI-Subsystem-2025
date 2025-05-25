@@ -1,0 +1,4 @@
+id,location,registration_in_progress,hashed_api_key,leds_flashing,created_at
+c7c71bd6-8891-44ee-8d8f-c5bf83bcdd60,Warehouse A,false,1e1c2af2a6dfd61ee93cbb003828e397b632a906232bb69f73d6b5e0a6bc895a,false,1748265093
+e750b3b9-b3f5-4e3c-9bf4-616f80f4c8ed,null,true,4c682c9118321286f9ed21fe363f6f15f937d8ded8a7b9858dbcf2e4b1c1cebf,false,1748783493
+4fa977ed-754e-464c-89f2-64dc5a5a715e,Dock 3,false,4cd53425de9dbe231611389889dacb206306d10c3acc668c2382d16005db68a0,false,1779714693

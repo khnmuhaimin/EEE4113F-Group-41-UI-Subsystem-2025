@@ -9,6 +9,9 @@
     }
   ],
   "compilerOptions": {
-    "types": ["node"]
+    "types": ["node"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   }
 }

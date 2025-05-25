@@ -35,7 +35,7 @@ def authenticate_weighing_node(func):
         if node_id is None:
             return ("Node ID header is missing.", HTTPStatus.UNAUTHORIZED)
         with Session(DatabaseEngineProvider.get_database_engine()) as session:
-            node = session.scalar(select(WeighingNode.uuid == node_id))
+            node = session.scalar(select(WeighingNode.uuid == UUID(node_id)))
             if node is None:
                 return ("Unauthorized.", HTTPStatus.UNAUTHORIZED)
             correct_api_key = verify_secret(api_key, node.hashed_api_key)
@@ -130,3 +130,42 @@ def authenticate_with_password(func):
         response = func(*args, **kwargs)
         return response
     return wrapper
+
+
+def enforce_registration_in_progress_value(in_progress: bool):
+    """
+    @enforce_registration_in_progress_value
+
+    Decorator to enforce registration status for a node. Can be configured for either registration in progress or complete.
+
+    Parameters:
+    - `in_progress` (bool): 
+    - `True`: Enforces that the node's registration is still in progress.
+    - `False`: Enforces that the node's registration is complete.
+
+    Returns:
+    - 401 if "Node-ID" header is missing.
+    - 404 if the node is not found.
+    - 400 if the nodes registration status does not match the required state (either in progress or complete).
+    """
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            node_id = request.headers.get("Node-ID")
+            if node_id is None:
+                return ("Node ID header is missing.", HTTPStatus.UNAUTHORIZED)
+            with Session(DatabaseEngineProvider.get_database_engine()) as session:
+                node = session.scalars(select(WeighingNode.uuid == node_id)).first()
+                if node is None:
+                    return ("Weighing node not found.", HTTPStatus.NOT_FOUND)
+                if in_progress and not node.registration_in_progress:
+                    return ("Registration is complete.", HTTPStatus.UNPROCESSABLE_ENTITY)
+                elif not in_progress and node.registration_in_progress:
+                    return ("Registration is in progress.", HTTPStatus.UNPROCESSABLE_ENTITY)
+            result = func(*args, **kwargs)
+            return result
+        return wrapper
+    return decorator
+
+
+enforce_registration_in_progress = enforce_registration_in_progress_value(in_progress=True)
+enforce_registration_complete = enforce_registration_in_progress_value(in_progress=False)

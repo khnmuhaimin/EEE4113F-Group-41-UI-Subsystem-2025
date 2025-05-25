@@ -17,45 +17,6 @@ from database.database import DatabaseEngineProvider
 weighing_node_blueprint = Blueprint("weighing_node", __name__)
 
 
-def enforce_registration_in_progress_value(in_progress: bool):
-    """
-    @enforce_registration_in_progress_value
-
-    Decorator to enforce registration status for a node. Can be configured for either registration in progress or complete.
-
-    Parameters:
-    - `in_progress` (bool): 
-    - `True`: Enforces that the node's registration is still in progress.
-    - `False`: Enforces that the node's registration is complete.
-
-    Returns:
-    - 401 if "Node-ID" header is missing.
-    - 404 if the node is not found.
-    - 400 if the nodes registration status does not match the required state (either in progress or complete).
-    """
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            node_id = request.headers.get("Node-ID")
-            if node_id is None:
-                return ("Node ID header is missing.", HTTPStatus.UNAUTHORIZED)
-            with Session(DatabaseEngineProvider.get_database_engine()) as session:
-                node = session.scalars(select(WeighingNode.uuid == node_id)).first()
-                if node is None:
-                    return ("Weighing node not found.", HTTPStatus.NOT_FOUND)
-                if in_progress and not node.registration_in_progress:
-                    return ("Registration is complete.", HTTPStatus.UNPROCESSABLE_ENTITY)
-                elif not in_progress and node.registration_in_progress:
-                    return ("Registration is in progress.", HTTPStatus.UNPROCESSABLE_ENTITY)
-            result = func(*args, **kwargs)
-            return result
-        return wrapper
-    return decorator
-
-
-enforce_registration_in_progress = enforce_registration_in_progress_value(in_progress=True)
-enforce_registration_complete = enforce_registration_in_progress_value(in_progress=False)
-
-
 @weighing_node_blueprint.route("/flash-leds", methods=["PUT"], endpoint="make_node_flash_leds")
 @authenticate_with_session_id
 def make_node_flash_leds():
@@ -126,27 +87,6 @@ def get_weighing_node():
 {str(node.leds_flashing).lower()}
 {datetime.fromtimestamp(node.created_at, tz=timezone.utc).isoformat()}"""
         return response, HTTPStatus.OK
-
-
-@weighing_node_blueprint.route("/registration/in-progress", endpoint="get_registration_tasks")
-@authenticate_with_session_id
-def get_registration_tasks():
-    """
-    GET /registration/in-progress
-
-    Returns a list of weighing nodes currently in the registration process.
-
-    Returns:
-    - 200 OK with a JSON list of nodes (can be empty).
-    - 400 if session cookie is missing.
-    - 401 if session is invalid or expired.
-    """
-    with Session(DatabaseEngineProvider.get_database_engine()) as session:
-        nodes_in_registration = session.scalars(select(WeighingNode).where(WeighingNode.registration_in_progress == True).order_by(WeighingNode.created_at)).all()
-        nodes_in_registration = list(map(lambda t: t.registration_in_progress_view(), nodes_in_registration))
-        response = jsonify(nodes_in_registration)
-        response.status_code = HTTPStatus.OK
-        return response
 
 
 @weighing_node_blueprint.route("/registration/approve", methods=["POST"], endpoint="approve_weighing_node_registration")

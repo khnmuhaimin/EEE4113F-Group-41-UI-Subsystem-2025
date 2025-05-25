@@ -1,8 +1,9 @@
 from http import HTTPStatus
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, send_file
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 
+from routes.auth import authenticate_with_session_id
 from database.models.weight_reading import WeightReading
 from database.database import DatabaseEngineProvider
 from log.log import logger
@@ -12,6 +13,7 @@ dashboard_blueprint = Blueprint("dashboard_blueprint", __name__)
 
 
 @dashboard_blueprint.route("weight-readings", methods=["GET"], endpoint="get_weight_readings")
+@authenticate_with_session_id
 def get_weight_readings():
     with Session(DatabaseEngineProvider.get_database_engine()) as session:
         readings = session.scalars(select(WeightReading).order_by(WeightReading.created_at)).all()
@@ -25,3 +27,17 @@ def get_weight_readings():
                 'created_at': r.created_at,
             })
         return jsonify(result), HTTPStatus.OK
+    
+
+
+@dashboard_blueprint.route('weight-readings/csv', endpoint="download_csv_data")
+@authenticate_with_session_id
+def download_csv_data():
+    file_path = 'weight-readings.csv'  # replace with your actual file path
+    return send_file(
+        file_path,
+        mimetype='text/csv',
+        as_attachment=True,
+        download_name='weight-readings.csv'  # filename for the download prompt
+    )
+

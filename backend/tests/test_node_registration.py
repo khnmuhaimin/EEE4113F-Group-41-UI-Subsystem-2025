@@ -9,9 +9,11 @@ import pytest
 
 
 def test_successful_start_node_registration(client: FlaskClient, database_engine: Engine):
+    print("")
     node_ids = set()
     node_api_keys = set()
 
+    print("Starting the registration process for 3 weighing nodes.")
     for i in range(3):
         response = client.post(
             "/api/weighing-nodes/registration/start",
@@ -23,20 +25,24 @@ def test_successful_start_node_registration(client: FlaskClient, database_engine
         assert len(response_body_lines) == 2
         node_ids.add(response_body_lines[0])
         node_api_keys.add(response_body_lines[1])
+
+    print("Confirming that new unregistered nodes were added to the database.")
     assert len(node_ids) == 3
     assert len(node_api_keys) == 3
     
 
 def test_successful_approval_of_weighing_node_registration(default_admin_client: FlaskClient, database_engine: Engine):
+    print("")
 
+    print("Inserting an unregistered node into the database.")
     default_admin_client.post(
-        "/api/weighing-nodes/registration/start",
-        headers={"Authorization":  Config.PRESHARED_KEY}
+        "/api/weighing-nodes/registration/start"
     )
 
     response = default_admin_client.get("/api/weighing-nodes/registration/in-progress")
     node_in_registration = response.json[0]
 
+    print("Approving the newly created node.")
     response = default_admin_client.post(
         "/api/weighing-nodes/registration/approve",
         json={"weighing_node_id": node_in_registration["id"]}
@@ -44,6 +50,7 @@ def test_successful_approval_of_weighing_node_registration(default_admin_client:
 
     assert response.status_code == 204
 
+    print("Confirming the node is marked with registration being complete.")
     with Session(database_engine) as session:
         registered_node = session.scalar(select(WeighingNode).where(WeighingNode.uuid == UUID(node_in_registration["id"])))
         assert registered_node is not None

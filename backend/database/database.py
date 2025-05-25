@@ -1,3 +1,4 @@
+import csv
 import random
 from uuid import uuid4
 import numpy as np
@@ -85,7 +86,7 @@ class DefaultDataProvider:
 
     @classmethod
     def load_default_weight_readings(cls, engine: Engine):
-        NUM_READINGS = 50
+        NUM_READINGS = 100
         NUM_PENGUINS = 10
         penguin_rfids = [str(uuid4()) for _ in range(NUM_PENGUINS)]
         node_ids = []
@@ -108,3 +109,36 @@ class DefaultDataProvider:
             session.commit()
         with Session(engine) as session:
             readings = session.scalars(select(WeightReading).order_by(WeightReading.created_at)).all()
+
+    @classmethod
+    def export_weighing_nodes_to_csv(cls, engine):
+        with Session(engine) as session:
+            nodes = session.scalars(select(WeighingNode)).all()
+        with open('weighing_nodes.csv', 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['id', 'location', 'registration_in_progress', 'hashed_api_key', 'leds_flashing', 'created_at'])
+            for node in nodes:
+                writer.writerow([
+                    node.uuid if node.uuid is not None else 'null',
+                    node.location if node.location is not None else 'null',
+                    'true' if node.registration_in_progress else 'false',
+                    node.hashed_api_key if node.hashed_api_key is not None else 'null',
+                    'true' if node.leds_flashing else 'false',
+                    node.created_at if node.created_at is not None else 'null',
+                ])
+
+    @classmethod
+    def export_weight_readings_to_csv(cls, engine):
+        with Session(engine) as session:
+            readings = session.scalars(select(WeightReading)).all()
+        with open('weight_readings.csv', 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['id', 'node_id', 'penguin_rfid', 'weight', 'created_at'])
+            for r in readings:
+                writer.writerow([
+                    r.node_id if r.node_id is not None else 'null',
+                    r.penguin_rfid if r.penguin_rfid is not None else 'null',
+                    r.weight if r.weight is not None else 'null',
+                    r.created_at if r.created_at is not None else 'null',
+                ])
+

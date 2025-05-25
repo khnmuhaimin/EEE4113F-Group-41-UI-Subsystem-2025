@@ -13,3 +13,18 @@ export const fetchWeightReadings = async (): Promise<Response> => {
     }
     return response;
 };
+
+
+/**
+ * Downloads the CSV data file from the server.
+ * Returns the raw Response for the caller to handle (e.g., save file).
+ * 
+ * @returns {Promise<Response>} Raw response object containing the CSV file.
+ */
+export const downloadWeightData = async (): Promise<Response> => {
+    const response = await fetch(`${API_BASE_URL}/weight-readings/csv'`);
+    if (!response.ok) {
+        throw new Error("Failed to download data.");
+    }
+    return response;
+};
