@@ -4,9 +4,9 @@ from uuid import UUID
 from flask import Blueprint, jsonify, request
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
 
-from auth.auth import generate_secret, hash_secret, verify_preshared_key
+from auth.auth import generate_secret, hash_secret
+from backend.websockets.notifications_manager import NotificationsManager
 from database.utils.utils import is_ip_address
 from database.models.weighing_node import WeighingNode
 
@@ -41,7 +41,6 @@ def make_node_flash_leds():
             return jsonify({"message": "The weighing node was not found."}), HTTPStatus.NOT_FOUND
         if flash_leds != node.leds_flashing:
             node.leds_flashing = flash_leds
-            # TODO: send a signal to the node to actually flash the LEDs
             session.commit()
         return ("", HTTPStatus.NO_CONTENT)
 
@@ -59,19 +58,14 @@ def start_registration():
 
     """    
     # create the new node
-    try:
-        with Session(DatabaseEngineProvider.get_database_engine()) as session:
-            node = WeighingNode()
-            node.api_key = generate_secret()
-            node.hashed_api_key = hash_secret(node.api_key)
-            session.add(node)
-            session.commit()
-            # TODO: alert admin
-            return (f"{node.uuid}\n{node.api_key}\n", HTTPStatus.OK)
-    except IntegrityError as e:
-        error_message = str(e.orig)
-        if error_message == "UNIQUE constraint failed: weighing_nodes.ip_address":
-            return ("The IP address is already in use.", HTTPStatus.CONFLICT)
+    with Session(DatabaseEngineProvider.get_database_engine()) as session:
+        node = WeighingNode()
+        node.api_key = generate_secret()
+        node.hashed_api_key = hash_secret(node.api_key)
+        session.add(node)
+        session.commit()
+        NotificationsManager.push_notification("FETCH_WEIGHING_NODES")
+        return (f"{node.uuid}\n{node.api_key}\n", HTTPStatus.OK)
         
 
 @weighing_node_blueprint.route("", endpoint="get_weighing_node")
@@ -122,7 +116,6 @@ def approve_weighing_node_registration():
              return ("", HTTPStatus.NO_CONTENT)
         node.registration_in_progress = False
         if node.leds_flashing:
-            pass  # TODO: notify node to not flash LEDs anymore
             node.leds_flashing = False
         session.commit()
         return ("", HTTPStatus.NO_CONTENT)
