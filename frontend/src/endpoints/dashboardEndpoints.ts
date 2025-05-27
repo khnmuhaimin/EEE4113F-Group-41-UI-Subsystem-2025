@@ -21,10 +21,7 @@ export const fetchWeightReadings = async (): Promise<Response> => {
  * 
  * @returns {Promise<Response>} Raw response object containing the CSV file.
  */
-export const downloadWeightData = async (): Promise<Response> => {
-    const response = await fetch(`${API_BASE_URL}/weight-readings/csv'`);
-    if (!response.ok) {
-        throw new Error("Failed to download data.");
-    }
-    return response;
+export const downloadWeightData = (): void => {
+    window.location.href = `${API_BASE_URL}/dashboard/weight-readings/csv`;
 };
+

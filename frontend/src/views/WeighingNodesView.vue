@@ -53,6 +53,9 @@ onMounted( async () => {
             </span>
             </p>
             <p class="card-text">
+            Last ping: 12 seconds ago
+            </p>
+            <p class="card-text">
             Created at: {{ new Date(node.created_at).toLocaleDateString() }}
             </p>
             <button v-if="node.registration_in_progress" class="btn btn-primary mt-2">

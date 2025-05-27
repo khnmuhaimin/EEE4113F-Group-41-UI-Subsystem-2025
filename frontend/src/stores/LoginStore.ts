@@ -6,6 +6,7 @@ import { deleteCookie } from "@/utils/utils"
 import { ref } from "vue"
 import router from "@/router"
 import { useUserStore } from "@/stores/UserStore"
+import { useWeighingNodesStore } from "./WeighingNodesStore"
 
 export const useLoginStore = defineStore("login", () => {
     const status = ref(LoginStatus.LOGGED_OUT)
@@ -113,11 +114,13 @@ export const useLoginStore = defineStore("login", () => {
         if (previousStatus === LoginStatus.LOGGED_IN) {
             await logoutAsAdmin()
         }
-        // reset just in case
+        // reset user and everything else
         const userStore = useUserStore()
         userStore.$reset()
         deleteCookie("session_id")
         status.value = LoginStatus.LOGGED_OUT
+        useWeighingNodesStore().reset()
+        router.push("/login")
     }
 
     /**

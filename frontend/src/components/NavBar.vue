@@ -3,6 +3,7 @@ import { UserType } from '@/enums/UserType';
 import router from '@/router';
 import { useLoginStore } from '@/stores/LoginStore';
 import { useUserStore } from '@/stores/UserStore';
+import { downloadWeightData } from '@/endpoints/dashboardEndpoints'
 
 const loginStore = useLoginStore()
 const userStore = useUserStore()
@@ -48,7 +49,7 @@ const dashboardActive = () => {
             <div class="collapse navbar-collapse" id="menu-container">
                 <ul id="menu-options" class="navbar-nav ms-auto mb-2 mb-lg-0">
                     <li v-if="userStore.type === UserType.ADMIN" class="nav-item">
-                        <button v-if="userStore.type === UserType.ADMIN" class="nav-link btn">Download Data</button>
+                        <button v-if="userStore.type === UserType.ADMIN" class="nav-link btn" :onclick="downloadWeightData" >Download Data</button>
                     </li>
                     <li class="nav-item">
                         <button class="nav-link btn" :onclick="viewDashboard" :disabled="dashboardActive()">Dashboard</button>

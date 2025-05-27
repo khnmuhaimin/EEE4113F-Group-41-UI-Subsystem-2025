@@ -1,3 +1,4 @@
+import os
 from flask_cors import CORS
 from flask import Flask
 
@@ -9,6 +10,7 @@ from routes.dashboard import dashboard_blueprint
 from log.log import logger
 
 
+logger.info(f"The server is running from dir {os.getcwd()}")
 logger.info(f"The server is running in the {Config.ENVIRONMENT} environment.")
 
 DatabaseEngineProvider.load_default_database()
@@ -25,6 +27,10 @@ CORS(server, supports_credentials=True, origins=Config.BASE_URL)
 server.register_blueprint(weighing_node_blueprint, url_prefix="/api/weighing-nodes")
 server.register_blueprint(admin_blueprint, url_prefix="/api/admins")
 server.register_blueprint(dashboard_blueprint, url_prefix="/api/dashboard")
+
+
+for rule in server.url_map.iter_rules():
+    logger.debug(f"Endpoint registered: {rule.endpoint}: {rule}")
 
     
 @server.route("/api")

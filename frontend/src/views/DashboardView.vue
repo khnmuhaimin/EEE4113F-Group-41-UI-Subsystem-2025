@@ -26,8 +26,10 @@ const handleLogout = () => {
 }
 
 onMounted(async () => {
-    await weightReadingsStore.fetch();
+  await weightReadingsStore.fetch();
+  if (userStore.type === UserType.ADMIN) {
     await weighingNodesStore.fetch();
+  }
 });
 
 </script>
@@ -39,17 +41,17 @@ onMounted(async () => {
       <DashboardCard>
         <h5>Weights Collected</h5>
         <p>Number of weight recordings collected.</p>
-        <p>{{ weightReadingsStore.numReadings() }}</p>
+        <p>{{ weightReadingsStore.fetchStatus === 'FETCHED' ? weightReadingsStore.numReadings() : '-'}}</p>
       </DashboardCard>
       <DashboardCard>
         <h5>Total Weighing Nodes</h5>
         <p>Weighing nodes registered</p>
-        <p>{{ weighingNodesStore.numNodes() }}</p>
+        <p>{{ weighingNodesStore.fetchStatus === 'FETCHED' ? weighingNodesStore.numNodes() : '-'}}</p>
       </DashboardCard>
       <DashboardCard>
         <h5>Weighing Nodes Online</h5>
         <p>Weighing nodes registered and alive.</p>
-        <p>{{ weighingNodesStore.numNodes() }}</p>
+        <p>{{ weighingNodesStore.fetchStatus === 'FETCHED' ? weighingNodesStore.numAliveNodes() : '-' }}</p>
       </DashboardCard>
     </div>
 
