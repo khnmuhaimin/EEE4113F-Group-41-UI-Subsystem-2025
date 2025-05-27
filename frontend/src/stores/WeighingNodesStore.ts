@@ -16,8 +16,30 @@ export const useWeighingNodesStore = defineStore("weighingNodes", () => {
             } else if (response.status === 200) {
                 fetchStatus.value = "FETCHED"
                 weighingNodes.value = await response.json() as WeighingNode[]
+                weighingNodes.value.sort((a, b) => {
+                    // Prioritize registration_in_progress
+                    if (a.registration_in_progress !== b.registration_in_progress) {
+                        if (a.registration_in_progress && !b.registration_in_progress) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
+                    }
+
+                    // If both are false, sort by location
+                    if (!a.registration_in_progress && !b.registration_in_progress) {
+                        if (a.location && b.location) {
+                            return a.location.localeCompare(b.location);
+                        }
+                        if (a.location) return -1;
+                        if (b.location) return 1;
+                        return 0;
+                    }
+
+                    return 0;
+                });
             }
-        }   
+        }
     }
 
     const numNodes = () => weighingNodes.value.length
