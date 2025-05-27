@@ -122,6 +122,33 @@ def approve_weighing_node_registration():
     
 
 
+@weighing_node_blueprint.route("", methods=["DELETE"], endpoint="delete_weighing_node")
+@authenticate_with_session_id
+def delete_weighing_node():
+    try:
+        node_id = request.json["weighing_node_id"]
+        node_id = UUID(str(node_id))
+    except KeyError:
+        response = jsonify({
+            "message": "The weighing node's ID is missing."
+        })
+        response.status_code = HTTPStatus.BAD_REQUEST
+        return response
+    except ValueError:
+        response = jsonify({
+            "message": "The weighing node's ID is invalid."
+        })
+        response.status_code = HTTPStatus.UNPROCESSABLE_ENTITY
+        return response
+    
+    with Session(DatabaseEngineProvider.get_database_engine()) as session:
+        node = session.scalar(select(WeighingNode).where(WeighingNode.uuid == node_id))
+        if node:
+            session.delete(node)
+            session.commit()
+        return ("", HTTPStatus.NO_CONTENT)
+
+
 @weighing_node_blueprint.route("all", endpoint="get_weighing_nodes")
 @authenticate_with_session_id
 def get_weighing_nodes():
