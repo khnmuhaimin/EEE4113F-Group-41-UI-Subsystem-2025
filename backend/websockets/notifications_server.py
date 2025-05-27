@@ -10,6 +10,7 @@ pubsub = r.pubsub()
 pubsub.subscribe("notifications")
 
 def add_connection(ws):
+    print("WebSocket client connected")
     connected.add(ws)
     try:
         for _ in ws:
@@ -22,6 +23,7 @@ def handle_send_notification_task():
     for message in pubsub.listen():
         if message["type"] == "message":
             notification = message["data"].decode()
+            print(f"Sending notification: {notification}")
             for ws in list(connected):
                 try:
                     ws.send(notification)

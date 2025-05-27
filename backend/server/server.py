@@ -2,12 +2,16 @@ import os
 from flask_cors import CORS
 from flask import Flask
 
+from websockets.notifications_manager import NotificationsManager
 from config.config import Config
 from database.database import DatabaseEngineProvider, DefaultDataProvider
 from routes.weighing_nodes import weighing_node_blueprint
 from routes.admin import admin_blueprint
 from routes.dashboard import dashboard_blueprint
 from log.log import logger
+
+
+NotificationsManager.push_notification("The server is starting...")
 
 
 logger.info(f"The server is running from dir {os.getcwd()}")

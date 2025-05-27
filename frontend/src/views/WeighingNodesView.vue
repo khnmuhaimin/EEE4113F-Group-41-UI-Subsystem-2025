@@ -6,12 +6,24 @@ import router from "@/router";
 import { useLoginStore } from "@/stores/LoginStore";
 import { useUserStore } from "@/stores/UserStore";
 import { useWeighingNodesStore } from "@/stores/WeighingNodesStore";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 const userStore = useUserStore()
 const weighingNodesStore = useWeighingNodesStore()
 const loginStore = useLoginStore()
 const bigMessage = ref("")
+
+
+const now = ref(Date.now());
+setInterval(() => now.value = Date.now(), 1000);
+
+const getLastPingText = (timestamp: string, _now = now.value) => {
+  const diff = (_now - new Date(timestamp).getTime()) / 1000;
+  if (diff < 60) return `${Math.floor(diff)} seconds ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+  return new Date(timestamp).toLocaleDateString();
+}
 
 onMounted( async () => {
     // if (userStore.type === UserType.GUEST) {
@@ -53,7 +65,7 @@ onMounted( async () => {
             </span>
             </p>
             <p class="card-text">
-            Last ping: 12 seconds ago
+                Last Ping: {{ getLastPingText(node.last_pinged_at) }}
             </p>
             <p class="card-text">
             Created at: {{ new Date(node.created_at).toLocaleDateString() }}

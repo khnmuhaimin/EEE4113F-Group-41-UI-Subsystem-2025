@@ -22,7 +22,11 @@ export const useWeighingNodesStore = defineStore("weighingNodes", () => {
 
     const numNodes = () => weighingNodes.value.length
 
-    const numAliveNodes = () => weighingNodes.value.length
+    const numAliveNodes = () =>
+    weighingNodes.value.filter(
+        node => (Date.now() - Date.parse(node.last_pinged_at)) < 300_000
+    ).length;
+
 
     const reset = () => {
         weighingNodes.value = []

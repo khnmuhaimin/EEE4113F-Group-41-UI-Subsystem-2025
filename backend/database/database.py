@@ -1,6 +1,6 @@
 import csv
 import random
-from uuid import uuid4
+from uuid import UUID, uuid4
 import numpy as np
 from sqlalchemy import Engine, create_engine, select
 from sqlalchemy.orm import Session
@@ -54,25 +54,26 @@ class DefaultDataProvider:
     def load_default_nodes(cls, engine: Engine):
         mock_nodes = [
             {
-                "location": "Warehouse A",
-                "registration_in_progress": False,
-                "api_key": generate_secret(),
-                "leds_flashing": False,
-                "created_at": utc_timestamp(86400)  # one day ago
+                "location": "Penguin Beach",
+                "registration_in_progress": True,
+                "uuid": UUID('46c34751-96b2-49e5-bfae-b730be5e00a3'),
+                "api_key": "1234",
+                "leds_flashing": False
             },
             {
                 "location": None,
                 "registration_in_progress": True,
                 "api_key": generate_secret(),
                 "leds_flashing": False,
-                "created_at": utc_timestamp(86400 * 7),  # one week ago
+                "last_pinged_at": utc_timestamp(-86400 * 6),  # one week ago
+                "created_at": utc_timestamp(-86400 * 7),  # one week ago
             },
             {
                 "location": "Dock 3",
                 "registration_in_progress": False,
                 "api_key": generate_secret(),
                 "leds_flashing": False,
-                "created_at": utc_timestamp(86400 * 365) # one year ago
+                "created_at": utc_timestamp(-86400 * 365) # one year ago
             }
         ]
         for node in mock_nodes:
@@ -114,7 +115,7 @@ class DefaultDataProvider:
     def export_weighing_nodes_to_csv(cls, engine):
         with Session(engine) as session:
             nodes = session.scalars(select(WeighingNode)).all()
-        with open('weighing_nodes.csv', 'w', newline='') as csvfile:
+        with open('weighing-nodes.csv', 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['id', 'location', 'registration_in_progress', 'hashed_api_key', 'leds_flashing', 'created_at'])
             for node in nodes:
@@ -131,7 +132,7 @@ class DefaultDataProvider:
     def export_weight_readings_to_csv(cls, engine):
         with Session(engine) as session:
             readings = session.scalars(select(WeightReading)).all()
-        with open('weight_readings.csv', 'w', newline='') as csvfile:
+        with open('weight-readings.csv', 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['id', 'node_id', 'penguin_rfid', 'weight', 'created_at'])
             for r in readings:
