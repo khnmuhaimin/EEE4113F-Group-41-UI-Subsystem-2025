@@ -39,4 +39,5 @@ for rule in server.url_map.iter_rules():
     
 @server.route("/api")
 def index():
+    NotificationsManager.push_notification("Someone got sent \"Hello World\"")
     return "Hello, World!"
