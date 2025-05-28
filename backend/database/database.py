@@ -129,10 +129,11 @@ class DefaultDataProvider:
                 ])
 
     @classmethod
-    def export_weight_readings_to_csv(cls, engine):
+    def export_weight_readings_to_csv(cls, engine, file_path='weight-readings.csv'):
         with Session(engine) as session:
             readings = session.scalars(select(WeightReading)).all()
-        with open('weight-readings.csv', 'w', newline='') as csvfile:
+        logger.debug(f"Readings found: {len(readings)}")
+        with open(file_path, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['id', 'node_id', 'penguin_rfid', 'weight', 'created_at'])
             for r in readings:

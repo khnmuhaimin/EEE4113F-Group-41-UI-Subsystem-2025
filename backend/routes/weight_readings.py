@@ -12,6 +12,7 @@ from database.models.weight_reading import WeightReading
 from database.database import DatabaseEngineProvider
 from routes.auth import authenticate_weighing_node, enforce_registration_complete
 from log.log import logger
+from websockets.notifications_manager import NotificationsManager
 
 
 weight_readings_blueprint = Blueprint("weight_readings_blueprint", __name__)
@@ -99,4 +100,5 @@ def create_weight_reading():
                 )
             )
         session.commit()
-    return HTTPStatus.NO_CONTENT
+    NotificationsManager.push_notification("FETCH_WEIGHT_READINGS")
+    return "", HTTPStatus.NO_CONTENT

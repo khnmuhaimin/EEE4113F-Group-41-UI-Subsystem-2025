@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, make_response, send_file
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 
+from database.database import DefaultDataProvider, DatabaseEngineProvider
 from routes.auth import authenticate_with_session_id
 from database.models.weight_reading import WeightReading
 from database.database import DatabaseEngineProvider
@@ -13,8 +14,10 @@ dashboard_blueprint = Blueprint("dashboard_blueprint", __name__)
 
 
 @dashboard_blueprint.route('weight-readings/csv', methods=["GET"], endpoint="download_csv_data")
+@authenticate_with_session_id
 def download_csv_data():
-    file_path = './../weight-readings.csv'  # replace with your actual file path
+    file_path = '/home/khnmuhaimin/EEE4113F/EEE4113F-Group-41-UI-Subsystem-2025/weight-readings.csv'  # replace with your actual file path
+    DefaultDataProvider.export_weight_readings_to_csv(DatabaseEngineProvider.get_database_engine(), file_path)
     response = make_response(send_file
         (
             file_path,
