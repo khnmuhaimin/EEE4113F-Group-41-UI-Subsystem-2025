@@ -1,5 +1,7 @@
 
+from datetime import datetime, timezone
 from http import HTTPStatus
+import struct
 from uuid import UUID
 from flask import Blueprint, request
 from flask import Blueprint
@@ -71,34 +73,88 @@ def parse_raw_weight_reading(line: str):
     return (rfid, weights, age)
 
 
+def parse_payload(data_str: str):
+    # First, recover the original bytes from Flask's string conversion
+    try:
+        # This assumes Flask used UTF-8 to decode the original bytes
+        original_bytes = data_str.encode('utf-8')
+    except UnicodeError:
+        raise ValueError("Invalid UTF-8 data")
+    
+    if len(original_bytes) < 10:
+        raise ValueError("Payload too short (needs at least 10 bytes)")
+    
+    # Extract first 10 bytes as ASCII
+    try:
+        prefix = original_bytes[:10].decode('ascii')
+    except UnicodeDecodeError:
+        raise ValueError("Prefix contains non-ASCII characters")
+    
+    # Process remaining bytes as big-endian integers (most significant byte first)
+    remaining_bytes = original_bytes[10:]
+    if len(remaining_bytes) % 4 != 0:
+        raise ValueError("Remaining data length must be divisible by 4 for 32-bit integers")
+    
+    ints = []
+    for i in range(0, len(remaining_bytes), 4):
+        chunk = remaining_bytes[i:i+4]
+        # '>' means big-endian (most significant byte first)
+        value = struct.unpack('>i', chunk)[0]
+        ints.append(value)
+    
+    return prefix, ints
+
+
+def get_rfid(content: str):
+    try:
+        valid = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890"
+        is_valid = [i in valid for i in content]
+        start = 1
+        while start < len(is_valid):
+            if is_valid[start] and not is_valid[start - 1]:
+                break
+            start += 1
+        rfid = content[start:start+12]
+        return rfid
+    except Exception as e:
+        logger.error(e)
+
+
+last_rfid = None
+time_of_last_rfid = None
 @weight_readings_blueprint.route("", methods=["POST"], endpoint="create_weight_reading")
 def create_weight_reading():
+    global last_rfid
+    global time_of_last_rfid
     # get plain text body
     content = request.get_data(as_text=True)
-    lines = content.strip().split('\n')
-    lines = [line.strip() for line in lines]
-    lines = [line for line in lines if line != ""]
-    if len(lines) == 0:
+    dot_index = content.rfind(".")
+    rfid = get_rfid(content)
+    if last_rfid is None:
+        last_rfid = rfid
+        time_of_last_rfid = datetime.now(tz=timezone.utc).timestamp()
+    elif rfid == last_rfid and (datetime.now(tz=timezone.utc).timestamp() - time_of_last_rfid) < 3:
+        time_of_last_rfid = datetime.now(tz=timezone.utc).timestamp()
         return "", HTTPStatus.NO_CONTENT
-    
-    for line in lines:
-        if not validate_raw_weight_reading(line):
-            return "Invalid request body.", HTTPStatus.BAD_REQUEST
-        
-    new_readings = [parse_raw_weight_reading(line) for line in lines]
 
+    weights = [float(content[dot_index-1:]) * 1000]
+
+    logger.debug(f"Content: {content}")
+    # rfid, weights = parse_payload(content)
+    logger.debug(f"RFID: {rfid}")
+    logger.debug(f"Weights: {weights}")
     with Session(DatabaseEngineProvider.get_database_engine()) as session:
         node_id = request.headers.get("Node-ID")
+        logger.debug(f"Node ID: {node_id}")
         node = session.scalars(select(WeighingNode).where(WeighingNode.uuid == UUID(node_id))).one()
-        for rfid, weights, age in new_readings:
-            session.add(
-                WeightReading(
-                    node_id=node.id,
-                    penguin_rfid=rfid,
-                    weight=sum(weights)/len(weights),
-                    created_at=utc_timestamp(-age)
-                )
+        logger.debug(f"Node ID found: {node.uuid}")
+        session.add(
+            WeightReading(
+                node_id=node.id,
+                penguin_rfid=rfid,
+                weight=sum(weights)/len(weights)
             )
+        )
         session.commit()
     NotificationsManager.push_notification("FETCH_WEIGHT_READINGS")
     return "", HTTPStatus.NO_CONTENT
