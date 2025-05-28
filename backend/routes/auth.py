@@ -35,7 +35,7 @@ def authenticate_weighing_node(func):
         if node_id is None:
             return ("Node ID header is missing.", HTTPStatus.UNAUTHORIZED)
         with Session(DatabaseEngineProvider.get_database_engine()) as session:
-            node = session.scalar(select(WeighingNode.uuid == UUID(node_id)))
+            node = session.scalar(select(WeighingNode).where(WeighingNode.uuid == UUID(node_id)))
             if node is None:
                 return ("Unauthorized.", HTTPStatus.UNAUTHORIZED)
             correct_api_key = verify_secret(api_key, node.hashed_api_key)

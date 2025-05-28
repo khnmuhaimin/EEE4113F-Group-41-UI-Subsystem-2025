@@ -55,7 +55,7 @@ class DefaultDataProvider:
         mock_nodes = [
             {
                 "location": "Penguin Beach",
-                "registration_in_progress": True,
+                "registration_in_progress": False,
                 "uuid": UUID('46c34751-96b2-49e5-bfae-b730be5e00a3'),
                 "api_key": "1234",
                 "leds_flashing": False

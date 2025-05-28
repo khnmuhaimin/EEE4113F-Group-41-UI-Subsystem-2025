@@ -8,6 +8,7 @@ from database.database import DatabaseEngineProvider, DefaultDataProvider
 from routes.weighing_nodes import weighing_node_blueprint
 from routes.admin import admin_blueprint
 from routes.dashboard import dashboard_blueprint
+from routes.weight_readings import weight_readings_blueprint
 from log.log import logger
 
 
@@ -31,6 +32,7 @@ CORS(server, supports_credentials=True, origins=Config.BASE_URL)
 server.register_blueprint(weighing_node_blueprint, url_prefix="/api/weighing-nodes")
 server.register_blueprint(admin_blueprint, url_prefix="/api/admins")
 server.register_blueprint(dashboard_blueprint, url_prefix="/api/dashboard")
+server.register_blueprint(weight_readings_blueprint, url_prefix="/api/weight-readings")
 
 
 for rule in server.url_map.iter_rules():

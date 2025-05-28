@@ -6,8 +6,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from auth.auth import generate_secret, hash_secret
-from backend.websockets.notifications_manager import NotificationsManager
-from database.utils.utils import is_ip_address
+from database.utils.utils import utc_timestamp
+from websockets.notifications_manager import NotificationsManager
 from database.models.weighing_node import WeighingNode
 
 from routes.auth import authenticate_with_session_id, authenticate_weighing_node
@@ -73,7 +73,7 @@ def start_registration():
 def get_weighing_node():
     node_id = UUID(request.headers.get("Node-ID"))
     with Session(DatabaseEngineProvider.get_database_engine()) as session:
-        node = session.scalars(select(WeighingNode).where(WeighingNode.uuid == node_id).order_by(WeighingNode.created_at)).one_or_none()
+        node = session.scalars(select(WeighingNode).where(WeighingNode.uuid == node_id)).one_or_none()
         # guaranteed to not be None
         response = f"""{str(node.uuid)}
 {"null" if node.location is None else node.location }
@@ -109,14 +109,22 @@ def approve_weighing_node_registration():
         })
         response.status_code = HTTPStatus.UNPROCESSABLE_ENTITY
         return response
+    try:
+        location = request.json["location"]
+    except KeyError:
+        response = jsonify({
+            "message": "The location is missing."
+        })
+        response.status_code = HTTPStatus.BAD_REQUEST
+        return response
     
     with Session(DatabaseEngineProvider.get_database_engine()) as session:
         node = session.scalar(select(WeighingNode).where(WeighingNode.uuid == node_id))
         if not node.registration_in_progress:
              return ("", HTTPStatus.NO_CONTENT)
         node.registration_in_progress = False
-        if node.leds_flashing:
-            node.leds_flashing = False
+        node.leds_flashing = False
+        node.location = location
         session.commit()
         return ("", HTTPStatus.NO_CONTENT)
     
@@ -158,3 +166,14 @@ def get_weighing_nodes():
         response = jsonify(weighing_nodes)
         response.status_code = HTTPStatus.OK
         return response
+    
+
+@weighing_node_blueprint.route("heartbeat", methods=["POST"], endpoint="heartbeat")
+@authenticate_weighing_node
+def get_weighing_node():
+    node_id = UUID(request.headers.get("Node-ID"))
+    with Session(DatabaseEngineProvider.get_database_engine()) as session:
+        node = session.scalars(select(WeighingNode).where(WeighingNode.uuid == node_id)).one_or_none()
+        node.last_pinged_at = utc_timestamp()
+        session.commit()
+        return "response", HTTPStatus.NO_CONTENT

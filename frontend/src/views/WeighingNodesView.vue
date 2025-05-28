@@ -69,7 +69,7 @@ onMounted( async () => {
             <p class="card-text">
                 Registration in progress: {{ node.registration_in_progress ? '✅' : '❌' }}
             </p>
-            <p class="card-text">
+            <p v-if="node.registration_in_progress" class="card-text">
                 LEDs flashing: {{ node.leds_flashing ? '✅' : '❌' }}
             </p>
             <p class="card-text">
@@ -78,20 +78,20 @@ onMounted( async () => {
             <p class="card-text">
                 Created at: {{ new Date(node.created_at).toLocaleDateString() }}
             </p>
+            <p v-if="node.registration_in_progress">Flash the LEDs to see which node is waiting to be registered. When you click the button, wait a few seconds. The node might take a few seconds to starts flashing its LEDs.</p>
             <div v-if="node.registration_in_progress" class="d-flex gap-2 mt-2">
-                <button  class="btn btn-success">
+                <button  class="btn btn-success" @click="() => weighingNodesStore.approveRegistration(node.id, node.location || '')">
                     Accept Node
                 </button>
-                <button class="btn btn-danger">
+                <button class="btn btn-danger" :onclick="() => weighingNodesStore.deleteNode(node.id)">
                     Reject Node
                 </button>
             </div>
-            <p v-if="node.registration_in_progress">Flash the LEDs to see which node is waiting to be registered. When you click the button, wait a few seconds. The node might take a few seconds to starts flashing its LEDs.</p>
             <div v-if="node.registration_in_progress"  class="d-flex gap-2 mt-2">
-                <button class="btn btn-warning" :disabled="node.leds_flashing">
+                <button class="btn btn-warning" :disabled="node.leds_flashing" :onclick="() => weighingNodesStore.flashLEDs(node.id, true)">
                     Flash LEDs
                 </button>
-                <button class="btn btn-secondary" :disabled="!node.leds_flashing">
+                <button class="btn btn-secondary" :disabled="!node.leds_flashing" :onclick="() => weighingNodesStore.flashLEDs(node.id, false)">
                     Turn off LEDs
                 </button>
             </div>
